@@ -12,7 +12,7 @@ We're so glad you have a desire to learn and teach with R! You are well on your 
 
 ## General Workshop Schedule
 
-All Sessions will take place in Holland Hall 111, though we may have breakout groups in other rooms.
+All Sessions will take place in **Holland Hall 111**, though we may have breakout groups in other rooms.
 
 You can find a more up to date and detailed [schedule for this workshop here](https://docs.google.com/document/d/1ONW5FzSkjX4-ginKAAPkKvnzDxuLzpaD-ZnjM6WWBKg/edit?usp=sharing).
 
@@ -30,9 +30,9 @@ R has a learning curve and nobody becomes an expert without making mistakes. Ple
 
 ## Accessing Materials
 
-As mentioned, you can access everything on the RStudio server or at the [St. Olaf R GitHub repository.](https://github.com/StOlafR/Workshop2026/tree/main). If you took notes and wrote your own files in the server during this workshop, we recommend **Exporting zipped folders of your material to your laptop** (check a folder to export, and then go to More \> Export in the File pane toolbar). We will remind you again on Wednesday to do this, after you’ve had a chance to write code for all of our activities. But don't worry, this folder will exist beyond this week.
+As mentioned, you can access everything on the RStudio server or at the [St. Olaf R GitHub repository](https://github.com/StOlafR/Workshop2026/tree/main). If you took notes and wrote your own files in the server during this workshop, we recommend **Exporting zipped folders of your material to your laptop** (check a folder to export, and then go to More \> Export in the File pane toolbar). We will remind you again on Wednesday to do this, after you’ve had a chance to write code for all of our activities. But don't worry, this folder will exist beyond this week.
 
-## R Resources developed through St. Olaf
+## R resources developed through St. Olaf
 
 Below are walkthroughs of the RStudio environment as well as some common errors for running code and knitting documents.
 
