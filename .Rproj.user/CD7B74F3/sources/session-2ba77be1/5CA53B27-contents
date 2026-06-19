@@ -1,0 +1,40 @@
+---
+title: "How to Publish an HTML document"
+format: html
+---
+
+
+1. Knit/render your document to HTML (and check it in the Viewer pane to make sure everything looks good.)
+
+2. Click the 'Publish' icon in the upper right corner of the screen and select "Publish Document...".
+
+![](images/publish.png)
+
+3. Select Posit Connect as the server to publish to.
+
+4. Choose to publish the finished product only.
+
+5. If you are doing it for the first time, you will be asked to connect to an account. Choose Posit Connect.
+
+6. Enter "https://rconnect.stolaf.edu" as the URL then click next.
+
+7. At this point you will be redirected to a webpage to sign in. Use your stolaf account to log in and follow the instructions to connect your RStudio to the server. Go back to your desktop RStudio and click 'Connect Account'.
+
+8. Double check the "Publish files from:" box to make sure everything you need is checked, most importantly the one with your file name ending in .html (it's usually pretty safe to assume all necessary files are automatically included). Give it a good Title and you are ready to publish the document.  click 'Publish'.
+
+9. After a minute or two, you will again be redirected to a browser where your document is now available. If your documents require a lot of packages and libraries, it can take several minutes to publish the first time, but will be faster after that. Edit the Share settings appropriately (Anyone - no login required is fine, but be aware that others will be able to see your work). Copy the Content URL to share.
+
+10. You may still edit your document and the 'Publish' icon turns into a 'Republish' icon that will update everything. Your URL will not change unless you choose to publish to a different account.
+
+
+::: {layout-ncol=2}
+![](images/Posit_connect.jpg){width=50%}
+
+![](images/publish_finished.jpg){width=50%}
+
+![](images/posit_connect2.jpg){width=50%}
+
+![](images/rconnect_url.jpg){width=50%}
+
+![](images/last_step.jpg){width=50%}
+:::

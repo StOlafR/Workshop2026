@@ -42,6 +42,8 @@ Below are walkthroughs of the RStudio environment as well as some common errors 
 - [How to join a course on RStudio server as a student or TA](https://stolafcarleton.teamdynamix.com/TDClient/1893/StOlaf/KB/Article/161475/Joining-an-RStudio-Course-as-a-Student-or-TA)
 - [How to create a course folder on RStudio server](https://stolafcarleton.teamdynamix.com/TDClient/1893/StOlaf/KB/Article/161417/Setting-up-an-RStudio-course-folder)
 - [SDS 316 R style guide](https://docs.google.com/document/d/1uYpoCIanQAMG-scidFh0-S-v0-Y3owWSPI5xEiTDDt8/edit?usp=sharing)
+- [St. Olaf RStudio Connect (Posit Connect) server for publishing HTML documents](https://rconnect.stolaf.edu)
+    - [How to publish with Posit Connect](https://rconnect.stolaf.edu/content/0689cd92-d8c2-47b9-9e28-8e2eefbb5820)
 
 ## R Cheatsheets and Guides
 
@@ -57,6 +59,8 @@ Below are walkthroughs of the RStudio environment as well as some common errors 
 - [Data Visualization using ggplot2](https://opensource.posit.co/resources/cheatsheets/data-visualization/)
 - [More RStudio developed Cheatsheets](https://opensource.posit.co/resources/cheatsheets/)
 - [More community contributed cheatsheets](https://rstudio.github.io/cheatsheets/contributed-cheatsheets.html)
+
+> RStudio's parent company recently rebranded as *Posit*, which you will see on many of their websites. The software is still called RStudio and you'll here us use that term pretty exclusively, but don't be worried if you follow links and see Posit everywhere.
 
 ## Additional R learning resources
 
