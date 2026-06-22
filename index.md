@@ -60,7 +60,7 @@ Below are walkthroughs of the RStudio environment as well as some common errors 
 - [More RStudio developed Cheatsheets](https://opensource.posit.co/resources/cheatsheets/)
 - [More community contributed cheatsheets](https://rstudio.github.io/cheatsheets/contributed-cheatsheets.html)
 
-> RStudio's parent company recently rebranded as *Posit*, which you will see on many of their websites. The software is still called RStudio and you'll here us use that term pretty exclusively, but don't be worried if you follow links and see Posit everywhere.
+> RStudio's parent company recently rebranded as *Posit*, which you will see on many of their websites. The software is still called RStudio and you'll hear us use that term pretty exclusively, but don't be worried if you follow links and see Posit everywhere.
 
 ## Additional R learning resources
 
