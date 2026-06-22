@@ -1,0 +1,31 @@
+For more information visit:
+https://www.fec.gov/campaign-finance-data/candidate-summary-file-description/
+
+These variables describe the fec_mn_2018 dataset. 
+Each row represents one candidate for US House of Representatives from Minnesota in 2018. 
+Minnesota has 8 reprsentatives. For each seat, there are parties from the major parties (Republican, Democrat) and other parties.
+
+These data represent financial information for each individual candidate's campaign.  "Contributions" refers to monetary donation to the candidate's campaign fund. 
+
+can_par_aff,  Candidate Party Affiliation
+can_inc_cha_ope_sea,  Candidate Incumbent/Challenger/Open Seat 
+can_nam,  Candidate name
+can_off, Candidate office (H for House, S for Senate)
+can_off_sta, Candidate office State
+can_off_dis, Candidate office district
+ind_con, Contributions to the candidate from individuals (individual people/potential voters)
+par_com_con,   Contributions to the candidate from the "Party Committee"; e.g. from the Republican or Democtratic party general campaign funds. 
+oth_com_con, Other Committee contributions (mostly these are contributions from PACs, or "Politial Action Committees")
+can_con, Candidate contribution from themselves
+tot_loa, Total loan
+net_con, Net contribution (sum of all contributions, minus any contribution refunds (see below)).
+can_loa_rep, Candidate loan repayment
+oth_loa_rep, Other loan repayment
+tot_loa_rep, Total loan repayment
+ind_ref, Amount of refunds to individuals
+par_com_ref, Amount of refunds to Party committee
+oth_com_ref, Amount of refunds to Other committees
+tot_con_ref, Total contributions refunded
+net_ope_exp, Net Operating Expenditure
+cov_sta_dat, Coverage start date (Date first report to FEC was filed)
+cov_end_dat, Coverage end date (Date of most recent report to FEC)
