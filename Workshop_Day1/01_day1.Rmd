@@ -1,0 +1,162 @@
+---
+title: 'Day 1 activity: UN Votes'
+author: "YOUR NAME HERE"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+editor_options:
+  chunk_output_type: console
+---
+
+*This activity is adapted from [Data Science in a Box](https://datasciencebox.org) by Mine Çetinkaya-Rundel*
+
+## Introduction
+
+How do various countries vote in the United Nations General Assembly, how have their voting patterns evolved throughout time, and how similarly or differently do they view certain issues?
+Answering these questions (at a high level) is the focus of this analysis.
+
+This document is an "Rmd" or "R markdown" file.
+
+```{r}
+2+2
+x <- 3
+x^2
+```
+
+
+### Packages
+
+R is open source and user contributed!
+Different functionalities exist in *packages* which you access each time you start a new document or R session.
+We will use the **tidyverse** and **lubridate** packages for data wrangling and visualization, and the **DT** package for interactive display of tabular output, and the **unvotes** package for the data.
+We use **ggthemes** to modify the visual appearance of the graph, including color palettes.
+
+```{r}
+#| label: load-packages
+#| warning: false
+#| message: false
+
+library(tidyverse)
+library(lubridate)
+library(DT)
+library(unvotes)
+library(ggthemes)
+
+```
+
+### Data
+
+The data we're using originally come from the **unvotes** package.
+In the chunk below we modify the data by joining the various data frames provided in the package to help you get started with the analysis.
+*(We'll see this in Chapter 20, around Day 15)*.
+
+```{r}
+unvotes <- un_votes %>%
+  inner_join(un_roll_calls, by = "rcid") %>%
+  inner_join(un_roll_call_issues, by = "rcid")
+
+unvotes
+```
+
+## UN voting patterns
+
+Let's create a data visualization that displays how the voting record of the United States changed over time on a variety of issues and compare it to two other countries: the UK and Turkey.
+
+We can easily change which countries are being plotted by changing which countries the code above `filter`s for.
+Note that the country name should be spelled and capitalized exactly the same way as it appears in the data.
+See the [Appendix](#appendix) for a list of the countries in the data.
+
+*We will learn `filter` on Day 5 (Ch 3.2), `mutate` on Day 6 (Ch 3.3) and `group_by` and `summarize` on Day 10 (Ch 3.5).*
+
+*We will start by learning more about creating plots with `ggplot` on Days 1-4!*
+
+```{r}
+#| label: plot-yearly-yes-issue
+#| message: false
+#| fig-width: 10
+#| fig-height: 6
+unvotes %>% 
+  filter(country %in% c("United Kingdom", 
+                        "United States", 
+                        "Turkey")) %>%
+  mutate(year = year(date)) %>%
+  group_by(country, year, issue) %>%
+  summarize(percent_yes = mean(vote == "yes")) %>%
+  ggplot(mapping = aes(x = year, 
+                       y = percent_yes, 
+                       color = country)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "loess", se = FALSE) +
+  facet_wrap(~issue) +
+  scale_y_continuous(labels = function(x) paste0(x*100, "%")) +
+  labs(
+    title = "Percentage of 'Yes' votes in the UN General Assembly",
+    subtitle = "1946 to 2019",
+    y = "% Yes",
+    x = "Year",
+    color = "Country"
+  ) +
+  theme_bw() 
+```
+
+# Working together we will:
+
+-   Run each chunk! Use the run button or the keyboard shortcut "Cmd/Ctrl + Enter/Return"
+-   Add `scale_color_colorblind()` to make this chart more accessible!
+-   Change the last line, `theme_bw()`, to `theme_clean()`. What happens? There are lots of themes to explore! Hit tab after you type `theme_` to see more options.
+-   Try commenting out the line `scale_y_continuous(...)` to see what it does. (Add \# at the beginning of the line and then re run the chunk)
+-   Comment out multiple lines to see what "labs" does. Highlight lines 76 - 82, then hit "Cmd/Ctrl + shift + C". Then re-run the chunk!
+-   Save the Rmd file to your "In Class Work" subfolder in your Student folder.
+-   Knit the document!
+
+# Your turn!
+
+1.  Pick three countries of your own choosing!
+    (Run the code in Appendix below for a list).
+    Describe patterns that you see.
+    Which countries vote most similarly?
+    On which issues?
+    Did this change over time?
+
+2.  Try a new theme to alter the general visual display of the graph!
+    Use the tab key to see all your options!
+
+3.  Before you leave class, be sure the document will still Knit!
+
+## References
+
+1.  David Robinson (2017). [unvotes](https://CRAN.R-project.org/package=unvotes): United Nations General Assembly Voting Data. R package version 0.2.0.
+2.  Erik Voeten "Data and Analyses of Voting in the UN General Assembly" Routledge Handbook of International Organization, edited by Bob Reinalda (published May 27, 2013).
+3.  Much of the analysis has been modeled on the examples presented in the [unvotes package vignette](https://cran.r-project.org/web/packages/unvotes/vignettes/unvotes.html).
+
+## Appendix {#appendix}
+
+Below is a list of countries in the dataset:
+
+```{r, eval=FALSE}
+#| label: list-countries
+#| echo: false
+
+unvotes %>% 
+  select(country) %>%
+  arrange(country) %>% 
+  distinct() %>%
+  datatable()
+```
+
+## A few terms you heard today:
+
+*R* is the programming language, the code.
+
+*RStudio* is the interface - all the windows and buttons we use to make things go.
+
+Sometimes you'll hear me (or other people) use the words interchangeably, to mean "use R to do stuff in RStudio!" :)
+
+The gray boxes are called code *chunks*, and everything inside them is *R* code.
+
+This file is an *R Markdown* document.
+The symbols you use to change bold, italics, and other formatting are *Markdown* syntax.
+The end of the file is *.Rmd*, that's how RStudio knows to treat it as a *R Markdown* file.
+We will always use this type of file in the class.
+Everything outside the code chunks (not in gray) is text (or formatting symbols).

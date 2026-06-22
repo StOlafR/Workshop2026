@@ -1,0 +1,129 @@
+---
+title: "Visualizing Distributions"
+subtitle: "bar chart, histogram, and density plot"
+author: "YOUR NAME HERE"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+urlcolor: blue
+editor_options:
+  chunk_output_type: console
+  markdown: 
+    wrap: 72
+---
+
+## Learning Goals:
+
+-   identify a variable as categorical or quantitative
+-   create and interpret a bar chart
+-   create and interpret a histogram
+-   create and interpret a density plot
+
+------------------------------------------------------------------------
+
+Today, we are going to use the penguins dataset again! 
+
+```{r}
+#| label: setup
+#| message: FALSE
+library(tidyverse)
+library(palmerpenguins)
+library(ggthemes)
+
+penguins <- palmerpenguins::penguins
+?penguins
+```
+
+# Bar charts display the distribution of Categorical variables
+
+A bar chart is the best way to show the distribution of a categorical variable. T
+
+```{r}
+ggplot(penguins, aes(x = species)) +
+  geom_bar()
+```
+
+Look at our ggplot recipe! We have an x-variable aesthetic and the "geom_bar" geom. 
+
+1.  Copy and modify the code above to create a bar chart of a different categorical variable from the penguins dataset.
+
+2.  Read the bar chart: describe the distribution by identifying the most and least common categories. Is there a big difference in the number of penguins per category? or are they similar?
+
+# Displaying distribution of Numerical variables
+
+There are several ways to show the distribution of a numerical variable.
+
+## Histogram:
+
+```{r}
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 2000)
+```
+
+3.  Try different values for binwidth above! What does this do?
+
+4.  Copy and modify the code above to make a histogram of flipper_length_mm. Binwidth = 200 looked good for body mass... does it work for flipper length? Experiment to find a better value.
+
+```{r}
+
+```
+
+5.  Alternatively, we can specify the number of bins, rather than the binwidth. Try different values!
+
+```{r}
+ggplot(penguins, aes(x = flipper_length_mm)) +
+  geom_histogram(bins = 20)
+```
+
+## A density plot is just a smoothed version of a histogram.
+
+```{r}
+ggplot(penguins, aes(x = flipper_length_mm)) +
+  geom_density()
+```
+
+# CHALLENGE QUESTION!
+
+In the density plot of body mass below, what does the red vertical line represent? Can you change this line to be one the mean instead of the median? Can you make it blue?
+
+```{r}
+ggplot(penguins, aes(x = body_mass_g))+ 
+  geom_density() + 
+  geom_vline(
+    xintercept = median(penguins$body_mass_g, na.rm = TRUE), 
+    col = "red"
+  )
+```
+
+
+# More practice!
+
+In this exercise we will use data from the year 2007 in the gapminder dataset. These data are country level data on the variables of average life expectancy at birth, GDP (gross domestic product) per capita, and population. With your table, describe the distribution!
+
+```{r}
+library(gapminder)
+gapminder07 <- filter(gapminder, year == 2007)
+```
+
+```{r}
+ggplot(gapminder07, aes(x = lifeExp)) + 
+  geom_density()
+```
+
+Center: Spread: Shape:
+
+```{r}
+ggplot(gapminder07, aes(x = gdpPercap)) + 
+  geom_density()
+```
+
+Center: Spread: Shape:
+
+```{r}
+ggplot(gapminder07, aes(x = pop)) + 
+  geom_histogram(bins = 50)
+```
+
+
+If you have more time, experiment with changing bins or binwidth, switching plot type (e.g. histogram or density) using the variables above.

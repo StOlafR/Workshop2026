@@ -1,0 +1,211 @@
+---
+title: "Importing Data"
+author: "Carlos Chavez"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+Learning Objectives:
+
+1. Use R to read in data from external files.
+2. Know different data file types.
+3. Use R Help Documentation to identify function arguments.
+4. Know and apply different function arguments to import tidied data.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+library(readr) # This package is a slight improvement over the base functions for importing .csv, .txt, .dat files
+library(readxl) # This package helps with importing Excel files
+library(haven) # This package helps with importing SPSS and STATA files
+```
+
+A great advantage of R is the flexibility it has with the data file types it can work with. While in general .csv files are preferred (across software), often times across collaborations, or for simplicity, we may be encounter a data set from a different data management system or software. 
+
+While we will introduce concepts of data tidying later, it turns out we can do a substantial amount of data tidying when we import and load the data into R!
+
+# Data Science Workflow 
+
+The following section is an excerpt from a quick unit on reading and writing data from SDS 164 Data Science 1. 
+
+Here is good practice in a data science workflow:
+
+1. Have one Rmd file where you begin with raw data (often reading the data in with `read_csv()`) and perform any necessary data wrangling
+2. Save the results of your data wrangling (your clean data) as a new csv file using `write_csv()`
+3. Have a different Rmd file where begin with your *cleaned* data using `read_csv()` and generate visualization and analyses to tell your story about the data
+
+When we read or write data, we often use an entire *filepath*.  In the code below, we read in the file `basketball_2023_2.csv` which is stored in our `Sds_101A_SSI26 > Class > Data folder`.  To denote the path to that file, we begin at Home ("~") and then place forward slashes ("/") between successive folders and subfolders.
+
+
+1. Use the function `read_csv` below to read in the file `basketball_2023_2.csv`. 
+
+Note: Don't worry about the code below for now - we just need to find the right file path to put into the `read_csv` function. 
+```{r, eval = FALSE}
+
+bball_fct <- read_csv("~/") |>
+  mutate(
+    points_per_minute = PTS/MP,
+    Pos = str_sub(Pos, 1,2),
+    Pos = str_replace(Pos, "-", "")
+  ) |>
+  rename(
+    FGpct = `FG%`,
+    FTpct = `FT%`,
+    TwoPointAttempt = `2PA`,
+    TwoPointPct = `2P%`,
+    ThreePointAttempt = `3PA`,
+    ThreePointPct = `3P%`,
+    Team = Tm,
+    MinutesPlayed = MP
+  ) |>
+  filter(G >=58) |>
+  select(Player, Pos, Age, Team, MinutesPlayed, FGpct, FTpct, TwoPointAttempt, TwoPointPct, ThreePointAttempt, ThreePointPct) |>
+  mutate(
+    twos_per_min = TwoPointAttempt / MinutesPlayed,
+    Pos = fct_reorder(Pos, twos_per_min)
+  )
+
+```
+
+
+2. Use the `write_csv` function to save the tidied version of the basketball data set. 
+
+
+```{r}
+
+write_csv(bball_fct, "TYPE FILE NAME HERE")
+
+```
+
+3. Read in the saved data file using `read_csv`. 
+
+```{r}
+
+bball_tidy <- read_csv("TYPE SAVED FILE PATH HERE")
+
+```
+
+
+# Reading in messy data
+
+For this portion, let's take a look at a data set from the reality TV show Survivor. 
+
+```{r, echo = FALSE}
+
+survivor <- read_csv("~/Sds_101A_SSI26/Class/Data/survivor_data.csv")
+
+```
+
+4. What are some issues that you see with the way these data have been imported?
+
+5. How might you resolve any identified issues with software outside of R?
+
+The `read_csv` function has a few arguments that are helpful for tidying the data without having to modify the original data file. We can refer to the help documentation for the function by looking at the different arguments. 
+
+To pull up the help documentation you can type `?function()` in a code chunk and the documentation for that function appear in the Help panel in the bottom right corner. 
+
+6. What should you type in the code chunk below to view the help documentation for the `read_csv` function?
+
+```{r help doc, echo = FALSE}
+
+
+
+```
+
+A good help documentation contains a short description of the function or package, what arguments the function can use, a detailed description of the arguments, and replicable and detailed examples.
+
+7. Looking at the Arguments section, what does the `skip` argument do to reading in the csv file? 
+
+8. Try using the `skip` argument to skip the first three rows.
+
+```{r}
+
+
+
+```
+
+You may have noticed that there are some columns with numbers for column names AND have no data in them. As you may have noticed, we can also select columns and specify the format for the columns for the data we are importing. 
+
+9. What is the range of columns in the Survivor data set that we want to read in? 
+
+Type the column names in the blanks on right hand side of the `col_select` argument. 
+```{r}
+
+survivor <- read_csv("~/Sds_101A_SSI26/Class/Data/survivor_data.csv",
+                     skip = 3,
+                     col_select = c(______:_______))
+
+```
+
+We can also use the `read_csv` function to rename columns. For example
+
+```{r}
+
+read_csv("~/Sds_101A_SSI26/Class/Data/survivor_data.csv",
+         skip = 3,
+         col_select = c(PID:Age),
+         col_names = c("PID", "Season", "Contestant", "Challenge_Wins",
+                       "Challenge_Avg", "Challenge_Win_Pct", "Survivor_Score",
+                       "Survivor_Avg", "Days", "Finish", "Time", "Sex",
+                       "DOB", "Film_Date", "Age"))
+
+```
+
+10. What do you notice about the first row in the resulting output? How might we modify the code above to fix this?
+
+```{r}
+
+
+
+
+
+```
+
+
+Lastly, we can also use `read_csv` to modify column types to reflect the appropriate data type. 
+
+For example we may want to specify the DOB and Film_Date columns as dates instead of character type variables. 
+
+```{r}
+read_csv("~/Sds_101A_SSI26/Class/Data/survivor_data.csv",
+         skip = 4,
+         col_select = c(PID:Age),
+         col_names = c("PID", "Season", "Contestant", "Challenge_Wins",
+                       "Challenge_Avg", "Challenge_Win_Pct", "Survivor_Score",
+                       "Survivor_Avg", "Days", "Finish", "Time", "Sex",
+                       "DOB", "Film_Date", "Age"),
+         col_types = cols(DOB = col_date(format = "%m/%d/%y"),
+                          Film_Date = col_date(format = "%m/%d/%y")))
+```
+
+
+# Reading in Excel files
+
+The process for reading in excel (.xlsx or .xls) files is a bit different depending on the excel file. One thing that is common in these files is having multiple sheets in a single workbook. 
+
+Let's take a look at the survivor data set again but this time as an excel file.
+
+By default, the `read_xlsx()` function will read in the first sheet of the workbook. In this case, the first sheet is a glossary of all the variables used in this data set. 
+
+```{r}
+read_xlsx("~/Sds_101A_SSI26/Class/Data/survivor_data.xlsx")
+```
+
+Thankfully much of the arguments from `read_csv` carry over to `read_xlsx`. However, we have some arguments that are excel file specific like sheet and range. 
+
+We can use the sheet argument to specify which sheet we want to read into R.
+
+For example, the code below reads in the second sheet of the excel workbook which happens to be the survivor data we were working with earlier!
+
+```{r}
+read_xlsx("~/Sds_101A_SSI26/Class/Data/survivor_data.xlsx", sheet = 3)
+```
+
+11. Try combining what we've done so far with `read_csv` with the `read_xlsx` function.
+
+```{r}
+
+```
+
+
+

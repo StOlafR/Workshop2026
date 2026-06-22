@@ -1,0 +1,259 @@
+---
+title: "Exploratory Data Analysis"
+output:
+  pdf_document:
+    fig_height: 3
+    fig_width: 4.5
+  word_document: default
+  html_document:
+    df_print: paged
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+# Summarizing and visualizing recap
+
+The following table recaps the methods for summarizing and visualizing two variables
+
+| Explanatory | Response    | Summarize           | Visualize                   |
+|-------------|:------------|:--------------------|:----------------------------|
+| None        | Categorical | table, prop table   | Bar plot                    |
+| Categorical | Categorical | table, prop table   | Bar plot, Mosaic plot       |
+| None        | Numerical   | summary stats       | Histogram, Box plot         |
+| Categorical | Numerical   | summary stats table | Stacked Histogram, Box plot |
+| Numerical   | Numerical   | correlation         | Scatter plot                |
+
+In a similar way, the following table summarizes the key `R` commands:
+
+| Explanatory | Response    | Summarize                                  | Visualize                                        |
+|-------------|:------------|:-------------------------------------------|:-------------------------------------------------|
+| None        | Categorical | `table()`, `proportions()`                 | `geom_bar()`                                     |
+| Categorical | Categorical | `table()`, `proportions()`, `addmargins()` | `geom_bar(position = "fill")` `geom_mosaic()`    |
+| None        | Numerical   | `mosaic:favstats()`                        | `geom_boxplot()` `geom_histogram()`              |
+| Categorical | Numerical   | `mosaic:favstats()`                        | `geom_boxplot()` `geom_histogram()+facet_grid()` |
+| Numerical   | Numerical   | `cor()`                                    | `geom_point() + geom_smooth()`                   |
+
+-   Notice commands for summarizing are put together using `%>%` (pipe)
+
+-   Notice commands for plots are put together using `+`
+
+-   The notation `y~x` means `y` is the response variable and `x` is the explanatory variable. We can use this in `table()` and in `favstats()`
+
+\newpage
+
+# Loading and Querying our dataset
+
+-   Loading the dataset:
+
+```{r}
+library(tidyverse)
+boybands <- read_csv("~/Sds_172_S26/Class/Data/boybands.csv")
+pockets <- read_csv("~/Sds_172_S26/Class/Data/pockets.csv")
+```
+
+-   Calculating the size of our dataset:
+
+```{r}
+dim(boybands)
+```
+
+-   Getting the names of the variables in our dataset
+
+```{r}
+colnames(pockets)
+```
+
+\newpage
+
+# Single categorical variable
+
+## Summarize
+
+-   Table:
+
+```{r}
+table(boybands$hair_length)
+```
+
+-   Proportions table with 2 decimal number
+
+```{r}
+table(boybands$hair_length) %>% proportions() %>% round(2)
+```
+
+## Visualize
+
+-   Bar plot:
+
+```{r}
+ggplot(boybands, aes(x=hair_length))+
+  geom_bar()+
+  labs(x="Hair Length",
+       title = "Most boyband members have short hair")
+```
+
+\newpage
+
+# Two categorical variables
+
+## Summarize:
+
+-   Table:
+
+```{r}
+table(boybands$hair_length, boybands$hair_frosted)
+```
+
+-   Table with totals per row and per column
+
+```{r}
+table(boybands$hair_length, boybands$hair_frosted) %>% addmargins()
+```
+
+-   Proportions table, with proportions per row
+
+```{r}
+table(boybands$hair_length, boybands$hair_frosted) %>% proportions(margin=1) %>% round(3)
+```
+
+## Visualize:
+
+-   Stacked bar plot
+
+```{r}
+ggplot(data = boybands, aes(x = hair_length, fill = hair_frosted)) + 
+  geom_bar() +
+  labs(x = "Hair Length",
+       title = "No frosting on long hair",
+       fill = "Frosted tips?")
+```
+
+-   Proportions bar plot:
+
+```{r}
+ggplot(data = boybands, aes(x = hair_length, fill = hair_frosted)) + 
+  geom_bar(position="fill") +
+  labs(x = "Hair Length",
+       title = "No frosting on long hair",
+       fill = "Frosted tips?")
+```
+
+-   Mosaic plot:
+
+```{r,eval=FALSE}
+library(ggmosaic)
+ggplot(data = boybands) + 
+  geom_mosaic(aes(x = product(hair_length), fill = hair_frosted))+
+  labs(x = "Hair Length",
+       title = "No frosting on long hair",
+       fill = "Frosted tips?")
+
+```
+
+\newpage
+
+# Single numerical variable
+
+## Summarize
+
+-   Summary statistics
+
+```{r}
+mosaic::favstats(pockets$maxHeightFront)
+```
+
+Remember to describe using the mnemonic `CUSS`, which stands for:
+
+-   *C*enter: Mean or median.
+-   *U*nusual features: Outliers.
+-   *S*pread: Standard Deviation, Interquartile range.
+-   *S*hape: Symmetric, skewed, multimodal
+
+## Visualize
+
+-   Histogram
+
+```{r}
+ggplot(pockets, aes(x = maxHeightFront)) +
+  geom_histogram(bins = 10) +
+  labs(x = "Maximum height of front pockets (cm)",
+       title = "Jeans' pocket heights")
+```
+
+-   Boxplot
+
+```{r}
+ggplot(pockets, aes(x = maxHeightFront)) +
+  geom_boxplot() +
+  labs(x = "Maximum height of front pockets (cm)",
+       title = "Jeans' pocket heights")
+```
+
+\newpage
+
+# Categorical by numerical
+
+## Summarize
+
+-   Summary statistics:
+
+```{r}
+mosaic::favstats(maxHeightFront~menWomen, data = pockets)
+```
+
+## Visualize:
+
+-   Boxplot:
+
+```{r}
+ggplot(pockets, aes(x=maxHeightFront, y=menWomen))+
+  geom_boxplot()+
+  labs(x="Height of Front Pocket",
+     title="Women's pockets are inferior")
+```
+
+-   Stacked histograms:
+
+```{r}
+ggplot(pockets, aes(x=maxHeightFront))+
+  geom_histogram(bins=10)+
+  facet_grid(menWomen~.)+
+  labs(x="Height of Front Pocket",
+       title="Women's pockets are inferior")
+```
+
+\newpage
+
+# Two numerical variables
+
+## Summarize
+
+-   Calculate correlation
+
+```{r}
+mosaic::cor(maxHeightFront ~ price, data = pockets)
+```
+
+## Visualize:
+
+-   Scatterplot
+
+```{r}
+ggplot(pockets, aes(x = price, y = maxHeightFront)) + 
+  geom_point() + 
+  labs(x = "Price", y = "Height of Front Pocket")
+```
+
+-   Scatterplot with linear trend
+
+```{r}
+ggplot(pockets, aes(x = price, y = maxHeightFront)) + 
+  geom_point() + 
+  geom_smooth(method = lm) +
+  labs(x = "Price", y = "Height of Front Pocket")
+
+```

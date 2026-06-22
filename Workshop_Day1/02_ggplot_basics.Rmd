@@ -1,0 +1,279 @@
+---
+title: "Intro to ggplot and Data visualization"
+author: "YOUR NAME HERE"
+subtitle: ggplot, geom_point
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+urlcolor: blue
+editor_options:
+  chunk_output_type: console
+---
+
+## Learning Goals:
+
+-   identify basics of a dataset: rows, columns, variables
+-   gain familiarity with basic R syntax, tidyverse
+-   identify a function and its structure (has (), inputs/arguments go inside ())
+-   make a scatterplot
+-   describe trends shown in a scatterplot
+
+------------------------------------------------------------------------
+
+First, we load the packages we will be using and the data:
+
+```{r}
+#| label: setup
+#| message: FALSE
+library(tidyverse)
+library(palmerpenguins)
+data(penguins)
+
+```
+
+# Background
+
+For today's exercise, we will use the `penguins` dataset. Be sure that you have run the chunk above, because "penguins" is from the `palmerpenguins` library.
+
+More details about palmerpenguins [here](https://allisonhorst.github.io/palmerpenguins/)
+
+We can view the dataset by typing its name:
+
+```{r}
+penguins
+
+# to see the first 10 rows and all columns
+print(penguins, n = 10, width = Inf)   
+```
+
+We can view the help file for penguins in this way:
+
+```{r}
+?penguins
+```
+
+<!-- This documentation describes the variables. ![image from https://allisonhorst.github.io/palmerpenguins/reference/figures/culmen_depth.png](~/Sds_101A_SSI26/Class/Code/Workshop_Day1/Images/images/image_culmen_depth.png) -->
+
+<!-- We will be examining characteristics of three species of penguins: Adelie, Chinstrap, and Gentoo. ![image from https://www.bas.ac.uk/wp-content/uploads/2015/04/Penguin-heights.jpg](~/Sds_101A_SSI26/Class/Code/Workshop_Day1/Images/images/image_penguin_heights.jpg) -->
+
+1)  How many rows are in the dataset? What does each row represent?
+
+2)  For each of the following variables, indicate whether it is categorical or numerical. If it is categorical, do the categories have a specific order? If it is numerical, is it discrete (whole numbers) or continuous (decimals possible)?
+
+species
+
+island
+
+bill_length_mm
+
+body_mass_g
+
+year
+
+# Making a scatterplot with geom_point()
+
+To examine the relationship between two numerical variables, we can use a *scatter plot*.
+
+An example plot:
+
+```{r}
+ggplot( #LINE 1 
+  data = penguins, #LINE 2
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)) + #LINE 3
+  geom_point() #LINE 4
+```
+
+3)  Identify what each line in the above code does:
+
+Line 1:
+
+Line 2:
+
+Line 3:
+
+Line 4:
+
+4)  Read the warning message that appears. What does it mean? Why is important that R notifies you of missing values?
+
+# Mapping aesthetics to variables
+
+5)  Modify the code below to map the color aesthetic to `species` (i.e. each species of penguin should be a different color).
+
+```{r}
+ggplot( 
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)) + 
+  geom_point() 
+```
+
+# Setting aesthetics to fixed values
+
+```{r}
+ggplot(data = penguins) + 
+  geom_point(
+    mapping = aes(
+      x = flipper_length_mm, 
+      y = body_mass_g, 
+      color = "blue"
+    )
+  )
+
+ggplot(data = penguins) + 
+  geom_point(
+    mapping = aes(
+      x = flipper_length_mm, 
+      y = body_mass_g
+    ),
+    color = "blue"
+  )
+```
+
+6)  Explain the difference in the two plots above. Be sure to run the plots one at a time by using "Cmd + Enter"
+
+7)  When should an aesthetic be inside aes() and when should it be outside aes()?
+
+# Mapping multiple aesthetics
+
+```{r}
+ggplot(
+  data = penguins,
+  mapping = aes(
+    x = flipper_length_mm, 
+    y = body_mass_g, 
+    color = species, 
+    size= bill_depth_mm)) + 
+  geom_point()
+```
+
+8)  In the code above, remove `size = bill_depth_mm` and try to instead map shape to species. Add that to the plot above!
+
+9)  What happens if we *also* map size to species? Do you like the look of this plot?
+
+# Shorter code
+
+Note that each of the following produce the exact same graph!!! 
+
+```{r}
+ggplot(
+  data = penguins,
+  mapping = aes(
+    x = flipper_length_mm,
+    y = body_mass_g, 
+    color = species)) + 
+  geom_point()
+  
+ggplot(
+  data = penguins, 
+  aes(
+    x = flipper_length_mm, 
+    y = body_mass_g, 
+    color = species)) + 
+  geom_point() 
+
+ggplot(
+  penguins, 
+  aes(
+    x = flipper_length_mm, 
+    y = body_mass_g, 
+    color = species)) + 
+  geom_point() 
+```
+
+# Aesthetics across layers.
+
+```{r}
+ggplot(
+  data = penguins, 
+  aes(x = flipper_length_mm, y = body_mass_g, color = species)) + 
+  geom_point() + 
+  geom_smooth(method = lm, se = FALSE)
+```
+
+11) What does the option `se = FALSE` do? (Remove it and run and see what happens!)
+
+12) What does the option `method = lm` do? (Remove it and run and see what happens!)
+
+13) Be sure to undo both the changes above so that it reads `geom_smooth(method = lm, se = FALSE)` again. Now compare that plot above to this one:
+
+```{r}
+ggplot(
+  data = penguins, 
+  aes(x = flipper_length_mm, y = body_mass_g)) + 
+  geom_point(aes(color = species)) + 
+  geom_smooth(method = lm, se = FALSE)
+```
+
+Describe the change in the graph's appearance. What change in the code led to this change in the plot?
+
+# More practice.
+
+14) Write code to create the plot below. 
+
+<!-- (If you'd like to see it bigger, go to the images folder and click on it.) ![length depth plot](~/Sds_101A_SSI26/Class/Code/Workshop_Day1/Images/images/plot_length_depth_penguins.png) -->
+
+To insert an R chunk here, you can use Ctr+Alt+I, the green chunk button, OR Code \> Insert chunk.
+
+```{r, echo=F, warning=F, message = F}
+
+penguins |> 
+  ggplot() +
+  geom_point(aes(bill_length_mm, bill_depth_mm, color = species))+
+  geom_smooth(aes(bill_length_mm, bill_depth_mm, color = species), method = "lm", se = F)
+
+```
+
+
+# Practice with figuring out errors!
+
+Fixing errors in your code is a useful skill! If you get an error message, first read the entire message to see if it provides clues about what the error is or where it occurred.
+
+Sometimes the messages are pretty cryptic, particularly when you are just learning R. Hopefully, it can give you a sense of at least WHERE the problem is.
+
+If the message doesn't point you in a particular direction, just start at the beginning and carefully compare to example code that you know works properly.
+
+15) For each of the graphs below, explain why we get errors (or they don't work as anticipated). Hint: Copy the code to a new chunk so that you can keep the original code for reference. Run one graph at a time with Ctrl+Enter (PC) or Command+Enter (Mac). Edit the code to make it work.
+
+```{r, eval=FALSE}
+# Example 1
+ggplot(data = penguins) + 
+  geom_point(
+    aes(
+      x = flipper_length_mm, 
+      y = body_mass_g, 
+      shape = 21, 
+      size = 5
+    )
+  )
+
+# Example 2
+ggplot(data = penguins) 
+  + geom_point(
+      aes(x = flipper_length_mm, y = body_mass_g), 
+      shape = 21, 
+      size = 5
+    )
+
+# Example 3
+ggplot(data = penguins) + 
+  geom_point(
+    x = flipper_length_mm, 
+    y = body_mass_g, 
+    shape = 21, 
+    size = 5
+  )
+
+# Example 4
+ggplot(data = penguins) + 
+  geom_point(
+    aes(
+      x = flipper_length_mm, y = body_mass_g
+    ), 
+    color = species, 
+    size = 5
+  )
+
+# Example 5
+ggplot(data = penguins) +
+  geom_point(mapping = aes(x = flipper_length, y = body_mass_g))
+```
