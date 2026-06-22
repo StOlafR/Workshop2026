@@ -3,7 +3,7 @@
     "path": "~/R/Rworkshop_2026/RWorkshop26_webpage/Workshop2026/index.md",
     "project_path": "index.md",
     "type": "markdown",
-    "hash": "3750730154",
+    "hash": "707591594",
     "contents": "",
     "dirty": false,
     "created": 1781895651254.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "44,71",
-        "scrollLine": "31"
+        "cursorPosition": "20,138",
+        "scrollLine": "0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1781900752,
+    "lastKnownWriteTime": 1782135093,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1781900752881,
+    "last_content_update": 1782135093336,
     "read_only": false,
     "read_only_alternatives": []
 }
