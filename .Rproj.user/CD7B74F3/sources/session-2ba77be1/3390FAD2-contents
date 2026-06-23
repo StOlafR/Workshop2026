@@ -19,7 +19,7 @@ You can find a more up to date and detailed [schedule for this workshop here](ht
 | Day | Classroom Session 1 (9-11:30) | Classroom Session 2 (12:30-3) |
 |------------------------|------------------------|------------------------|
 | Monday, June 22 | Introduction to R and RStudio ([presentation](https://rconnect.stolaf.edu/content/477a6b2e-62a0-4731-96c7-354c112a93d6)) | Introduction to Tidyverse |
-| Tuesday, June 23 | Tidyverse Part 2 | Pedagogy of teaching R in the classroom: Part 1 |
+| Tuesday, June 23 | Tidyverse Part 2 | Pedagogy of teaching R in the classroom: Part 1 ([presentation](https://rconnect.stolaf.edu/content/0b7d384e-a9ae-43be-89d5-99036d65f82e)) |
 | Wednesday, June 24 | Pedagogy of teaching R in the classroom: Part 2 | Advanced topics TBD |
 
 ## Questions
