@@ -57,6 +57,7 @@ Below are walkthroughs of the RStudio environment as well as some common errors 
 - [Data Import](https://opensource.posit.co/resources/cheatsheets/data-import/)
 - [Data Wrangling](https://opensource.posit.co/resources/cheatsheets/data-transformation/)
 - [Data Visualization using ggplot2](https://opensource.posit.co/resources/cheatsheets/data-visualization/)
+- [R Graph Gallery (examples with code)](https://r-graph-gallery.com/)
 - [More RStudio developed Cheatsheets](https://opensource.posit.co/resources/cheatsheets/)
 - [More community contributed cheatsheets](https://rstudio.github.io/cheatsheets/contributed-cheatsheets.html)
 
