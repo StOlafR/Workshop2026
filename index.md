@@ -53,7 +53,7 @@ Below are walkthroughs of the RStudio environment as well as some common errors 
 - [Basic R Code](https://rstudio.github.io/cheatsheets/base-r.pdf)
 - [Best Practice for R](https://rstudio.github.io/cheatsheets/R-best-practice.pdf)
 - [Best Practices for Writing Code Comments](https://stackoverflow.blog/2021/12/23/best-practices-for-writing-code-comments/)
-- [R Coding Style Guide](https://style.tidyverse.org/)
+- [R Coding Style Guide](https://style.tidyverse.org/syntax.html)
 - [Data Import](https://opensource.posit.co/resources/cheatsheets/data-import/)
 - [Data Wrangling](https://opensource.posit.co/resources/cheatsheets/data-transformation/)
 - [Data Visualization using ggplot2](https://opensource.posit.co/resources/cheatsheets/data-visualization/)
