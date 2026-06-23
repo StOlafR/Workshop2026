@@ -1,0 +1,172 @@
+---
+title: "Connecting steps with pipes"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+
+## Learning Goals:
+
+- use the pipe operator to complete multi-step data tasks
+
+- identify steps needed to go from "data A" to "data B"
+
+-----------------------------------------------------------------
+
+Reminder of our data transformation verbs: 
+
+* on Rows: filter(), arrange()
+
+* on Columns: mutate(), select(), rename(), relocate()
+
+* These verbs operate on rows, but also result in smaller tibbles with different columns: count(), distinct()
+
+-----------
+
+```{r}
+#| message: FALSE
+library(tidyverse)
+library(palmerpenguins)
+
+penguins <- palmerpenguins::penguins
+```
+
+# Part 1: Identify steps
+
+For each of the following, we are starting with the penguins dataset. 
+
+1. Which species of penguins were found on Biscoe Island in 2007? Write code to answer the question!
+
+
+
+2. HOW MANY of each species of penguin were found on Biscoe Island in 2007? Write code to answer the question!
+
+
+
+3. How do we get this table? (Create a chunk and write the code)
+
+```
+# A tibble: 5 × 4
+  species   island sex        n
+  <fct>     <fct>  <fct>  <int>
+1 Chinstrap Dream  female    34
+2 Chinstrap Dream  male      34
+3 Gentoo    Biscoe female    58
+4 Gentoo    Biscoe male      61
+5 Gentoo    Biscoe NA         5
+```
+
+
+4. What if we wanted to exclude the penguins where sex was not recorded? We can use !is.na() in the filter... (just as != is not equal to, !is.na() is NOT NA). Copy and modify the code above to achieve this. 
+
+
+5. How do we get this table? (Create a chunk and write the code)
+
+```
+# A tibble: 3 × 2
+  Island    `Number of penguins`
+  <fct>                    <int>
+1 Torgersen                   52
+2 Dream                      124
+3 Biscoe                     168
+```
+
+
+# Part 2: Covid Vaccination Example
+
+For this activity, we are using data from the US Center for Disease Control and Prevention (CDC) available from their [Data catalog](https://data.cdc.gov/Vaccinations/COVID-19-Vaccination-Trends-in-the-United-States-N/rh2h-3yt2).  Variable definitions can be found at the previous link.
+
+Today's task is to make a graph like the one in Class > Code > Workshop_Day1 > Images > covid_plot.png.  You'll have many steps, so link them with pipes where possible!  And follow the Tidyverse Style Guide as closely as possible!
+
+```{r}
+covid_vax <- read_csv("~/Sds_101A_SSI26/Class/Data/covid_vax.csv")
+
+covid_vax
+#View(covid_vax)
+```
+
+6. First, let's get to know our data a little bit. What are the possible values for `date_type`? (write code to find out!)
+
+```{r}
+
+```
+
+
+7. In the data definitions, we see that `date_type` indicates whether the information is for the date the vaccine was administered (given to a patient) or the date the vaccination was reported to CDC. We want to use the day the vaccine was administered. What should our filter be?
+
+```{r}
+
+```
+
+
+8. Next, we only want the US total, not state by state. I figured out what we need by running the following code. Scrolling through, you should see that "US" is one of the location options. Add this to your filter above.
+
+```{r, eval= FALSE}
+
+covid_vax |>
+  distinct(Location) |> 
+  arrange(Location) |>
+  View()
+
+# Note: the eval= FALSE above means this chunk will not be evaluated when knit.
+```
+
+
+9. Next, let's limit ourselves to only the important columns: `Date`, `Location`, `Administered Daily`, and `Administered 7 Day Rolling Average`. Add the appropriate code to your pipeline after the filter.
+
+
+10. `Administered Daily` and `Administered 7 Day Rolling Average` are non-syntactic and very long! Give them better names. 
+
+
+11. Notice that the number of doses along the y-axis in the graph is the number of doses in millions. Change your daily and 7 day average doses columns to be in millions. 
+
+
+12. Notice that the date is currently a character variable, in the format MM/DD/YYYY (month/day/year, as dates are commonly written in the US). R actually has a special date class for variables and a special library for working with dates. Using it will make our x-axis look prettier! The following code will make this change. Run the library and add the mutate below to your pipeline! (Note: can it be combined with other mutate steps?)
+
+```{r}
+library(lubridate)
+# mutate(Date = mdy(Date))
+```
+
+
+13. Hooray! The data should be how you want! You can now pipe your data from (12) directly into the code below to get the desired plot. Be sure to change the y variables to the names you used.
+
+```{r, error = TRUE}
+
+  ggplot(aes(x = Date)) +   
+  # Notice: no data here, since you PIPE THE DATA IN!!!
+    geom_col(aes(y = daily_doses), color = "deepskyblue4") +
+    geom_line(aes(y = rolling7day_doses), color = "darkred") + 
+    labs(
+      x = "Date Administered", 
+      y = "Doses",
+      title = "Daily Count of Doses by Date of Vaccine Administration, United States", 
+      subtitle = "Red line is 7 day rolling average",
+      caption = "Data source: CDC Covid tracker, \ncovid.cdc.gov/covid-data-tracker/#vaccination-trends"
+    ) +
+    scale_x_date(date_labels = "%b %d, '%y")
+```
+
+
+14. If you have more time:  Try changing your filter to include several states (instead of US total) and then add facet_wrap to get a separate plot for each state! (Choose any states you want, or try MN, WI, IA, ND).
+
+
+15. More time? Try being fancy! See how closely you can match the original plot.  Notice features such as:
+
+- color of y-axis labels
+- units in y-axis labels
+- color and thickness of vertical blue bars and red smoother
+- plot theme
+- dates on the x-axis
+- and more!
+
+You can also add features such as vertical lines for relevant dates. For example, the bivalent booster was first recommended by CDC on September 1, 2022.  You can add it with this code: 
+
+```{r}
+# geom_vline(xintercept = mdy("9/1/2022"))
+```
+
+Show me what you end up with!
