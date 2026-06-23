@@ -1,0 +1,373 @@
+---
+title: "Ch 7: Linear Regression with a Single Predictor - Sleep Study"
+output:
+  pdf_document:
+    fig_height: 3
+    fig_width: 4.5
+  html_document: default
+  word_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+# Goals
+
+1.  Practice exploratory data analyses for two numeric variables from a real study.
+
+2.  Fit a regression line to a scatterplot.
+
+3.  Identify the equation of the fitted line (slope and intercept).
+
+4.  Calculate residuals and correlation.
+
+# Required readings
+
+-   Read [chapter 7.1](https://openintro-ims.netlify.app/model-slr.html#fit-line-res-cor)
+
+-   Complete the [Regression line tutorial](https://rconnect.stolaf.edu/content/e96443b4-57f0-4962-b221-b7c6eca97d40)
+
+# New Code
+
+-   `lm(y ~ x, data = sleep)` fits a regression line and provides coefficient estimates (intercepts and slopes)
+
+    -   `y` is the response variable
+
+    -   `x` is the explanatory variable
+
+-   `filter(x >= __)` selects a subset of the data based on a logical statement using variables.
+    Use `>`, `<`, `>=`, `<=`, `==`(exactly equal to) and `!=`(not equal to) within the argument.
+    Ex.
+    We only want people who are 20 years old from the data, `filter(age == 20)`.
+
+-   `select(var1, var2, ...)` selects variables (columns) to view or keep from the original dataset.
+
+-   `mutate(new_var = ____)` creates a new variable in the dataset.
+    You may create something completely new, or transform existing variables.
+
+-   `resid_panel()` plot that produces plot of residuals (Note this function is in the `ggResidpanel` package)
+
+# Before class
+
+Circadian rhythms refer to biological processes that have a period of around 24 hours.
+These processes allow organisms to coordinate behavior with the day/night cycle.
+
+Circadian rhythms vary across individuals and have been categorized into three chronotypes: morning type, evening type and intermediate type.
+These refer to the time of day when individuals are most active.
+A number of studies have indicated that chronotypes differ in aspects of personality, such as depression, creativity, and sociosexuality.
+
+Today we'll explore data collected by Onyper et al on a number of variables associated with sleep.
+The data was collected from 253 students from a small, Northeastern liberal arts college.
+Students kept a sleep diary, took a survey about attitudes and habits, and performed cognitive tests.
+Information about GPA and demographic characteristics were also recorded.
+Their data is stored as `SleepStudy.csv`, and the entire article can be found on Moodle.
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+# Packages required
+library(ggResidpanel) # Need this for resid_panel() function
+library(tidyverse)
+
+# Data import
+sleep <- read_csv("~/Sds_172_SSI25/Class/Data/SleepStudy.csv")
+```
+
+Acquaint yourself with the variables in the dataset.
+A full list of variables is provided below.
+
+| Variable           | Description                                    |
+|--------------------|------------------------------------------------|
+| `Gender`           | Gender (1 = male, 0 = female)                  |
+| `ClassYear`        | Year in school                                 |
+| `LarkOwl`          | Early riser or night owl or neither            |
+| `NumEarlyClass`    | Number classes per week before 9:00 AM         |
+| `EarlyClass`       | Indicator for early classes                    |
+| `GPA`              | GPA                                            |
+| `ClassesMissed`    | Number classes missed                          |
+| `CognitionZscore`  | Z score for cognitive skills test              |
+| `PoorSleepQuality` | Measure of sleep quality                       |
+| `DepressionStatus` | Measure of degree of depression                |
+| `AnxietyStatus`    | Measure of amount of anxiety                   |
+| `Stress`           | Measure of amount of stress                    |
+| `DepressionScore`  | Depression score                               |
+| `AnxietyScore`     | Anxiety score                                  |
+| `StressScore`      | Stress score                                   |
+| `DASScore`         | Combined score (depression + anxiety + stress) |
+| `Happiness`        | Measure of degree of happiness                 |
+| `AlcoholUse`       | Self reported alcohol use                      |
+| `Drinks`           | Number alcoholic drinks per week               |
+| `WeekdayBed`       | Average weekday bed time (24 = midnight)       |
+| `WeekdayRise`      | Average weekday rise time (8.0 = 8:00 AM)      |
+| `WeekdaySleep`     | Average hours of sleep on weekdays             |
+| `WeekendBed`       | Average weekend bed time (24 = midnight)       |
+| `WeekendRise`      | Average weekend rise time (8.0 = 8:00 AM)      |
+| `WeekendSleep`     | Average hours of sleep on weekends             |
+| `AverageSleep`     | Average hours of sleep for all days            |
+| `AllNighter`       | Indicator for all nighter (1 = yes, 0 = no)    |
+
+1.  Our goal is to investigate the relationship between the time students go to bed on weekends (`WeekendBed`) and the time they wake up on weekends (`WeekendRise`). We begin by looking at each of the individual variables. Write a brief description for each variable using the "CUSS" method.
+
+Weekend Bed time plots:
+
+```{r}
+# DO NOT EDIT THIS CHUNK
+library(gridExtra) # Allows us to put two plots in same window
+
+plot1 <- ggplot(data = sleep, aes(x = WeekendBed)) +
+  geom_histogram(bins = 10) +
+  labs(title = "Distribution of Weekend Bedtime",
+       x = "Bedtime (24 = Midnight)") + 
+  xlim(21, 31)
+
+plot2 <- ggplot(data = sleep, aes(x = WeekendBed)) +
+  geom_boxplot() +
+  labs(x = "Bedtime (24 = Midnight)")+ 
+  xlim(21, 31)
+
+grid.arrange(plot1, plot2, ncol = 1)
+
+```
+
+Weekend Bed time summary statistics:
+
+```{r}
+mosaic::favstats(~ WeekendBed, data = sleep)
+```
+
+Weekend Rise time plots:
+
+```{r}
+# DO NOT EDIT THIS CHUNK
+plot1 <- ggplot(data = sleep, aes(x = WeekendRise)) +
+  geom_histogram(bins = 10) +
+  labs(title = "Distribution of Weekend Risetime",
+       x = "Risetime (8.0 = 8:00am)") + 
+  xlim(4, 17)
+
+plot2 <- ggplot(data = sleep, aes(x = WeekendRise)) +
+  geom_boxplot() +
+  labs(x = "Risetime (8.0 = 8:00am)")+ 
+  xlim(4, 17)
+
+grid.arrange(plot1, plot2, ncol = 1)
+```
+
+Weekend Rise time summary statistics:
+
+```{r}
+mosaic::favstats(~ WeekendRise, data = sleep)
+```
+
+# In-class work
+
+2.  Next, we examine the relationship between the two numeric variables using a scatterplot. Describe the relationship between `WeekendBed` and `WeekendRise`. Be sure to identify the *response* and *explanatory* variable and note the direction and strength of the relationship.
+
+```{r}
+ggplot(sleep, aes(x = WeekendBed, y = WeekendRise)) + 
+  geom_point() + 
+  geom_smooth(method = lm, se = FALSE) 
+```
+
+3.  We can use R to find the equation of the line shown in the plot above. Replace the words `response` and `explanatory` with the appropriate variable names. Be sure to check capitalization! Remove the #s and then run the code!
+
+```{r}
+# fitline1 <- lm(response ~ explanatory, data = sleep)
+# summary(fitline1)
+```
+
+A Fitted line can be described by the following equation.
+$\beta_0$ is the intercept and $\beta_1$ is the slope.\
+$$\hat{y}=\hat{\beta_0}+\hat{\beta_1}x$$
+
+Using the R output above fill in the expression for the fitted equation.
+
+$$\widehat{WeekendRise}= ? + ? \times ? $$ Notice that we put a "hat" on the WeekendRise time because it is the PREDICTED value for a given bedtime.
+We can interpret this as the predicted rise time for a single student who went to bed at 1am, or as the estimated AVERAGE risetime for all students who went to bed at 1am.
+
+4.  Use the equation to find the predicted (or average) weekend rise time for students who go to bed at 1 am (Bedtime = 25). You can use R like a calculator in the chunk below!
+
+```{r}
+
+```
+
+5.  The code below shows the actual WeekendRise time for the 17 students who went to bed at 1am. Did they all wake up at the predicted time?
+
+```{r}
+# DO NOT EDIT THIS CHUNK
+sleep |> 
+  filter(WeekendBed == 25) |>
+  select(WeekendBed, WeekendRise)
+```
+
+DEFINITION: A *residual* is the difference between the observed (actual) value of the response and the value predicted by the model.
+
+$$ residual = observed - predicted $$ We can also write this definition using symbols: $$ e_i = y_i -\hat{y_i}$$
+
+6.  In row 2 of the table above, we see a student who went to bed at 1 am and woke up at 8:45am (WeekendRise = 8.75). Their *residual* would be 8.75 - 9.875 = -1.125. Compute the residual for the third student, who woke up at 10:30 (WeekendRise = 10.5). (Use R like a calculator in the chunk below)
+
+```{r}
+
+```
+
+7.  The chunk below shows all students who went to bed at 1am and their residuals. Confirm the residuals we calculated in 6, then choose one of the capitalized words in each pair to make the statements below true.
+
+```{r, error = TRUE}
+# DO NOT EDIT THIS CHUNK
+# This code shows us the residuals for all students who went to bed at 1am
+sleep |>
+  mutate(predicted = predict(fitline1), 
+         resid1 = residuals(fitline1)) |>
+  filter(WeekendBed == 25) |>
+  select(WeekendBed, WeekendRise, predicted, resid1)
+```
+
+A negative residual indicates a student woke EARLIER/LATER than expected.
+These points are ABOVE/BELOW the regression line.
+
+A positive residual indicates a student woke EARLIER/LATER than expected.
+These points are ABOVE/BELOW the regression line.
+
+Side note: One way to look at all of the residuals is the *Residual vs Predicted Plot*.
+Later on we will use this plot to evaluate the quality of our regression model!
+
+```{r, error = TRUE}
+resid_panel(fitline1, plots = "resid")
+# If this code gives you an error, run the very first chunk of this document!
+```
+
+8.  A useful measure to describe the strength and direction is the *correlation*. What is the correlation between `WeekendBed` and `WeekendRise`?
+
+```{r}
+mosaic::cor(WeekendBed ~ WeekendRise, data = sleep)
+```
+
+## Correlation Comparison
+
+9.  For each pair of graphs, identify which pair has the STRONGER correlation. Use the cor function to confirm.
+
+<!-- -->
+
+a.  Which pair has stronger correlation?
+
+```{r, fig.width = 6.5}
+# DO NOT EDIT THIS CHUNK
+library(patchwork)
+plot1 <- ggplot(sleep, aes(x = AverageSleep, y = Happiness)) +     
+  geom_point() + 
+  geom_smooth(se = FALSE, method = lm)
+
+plot2 <- ggplot(sleep, aes(x = PoorSleepQuality, y = Happiness)) +     
+  geom_point() + 
+  geom_smooth(se = FALSE, method = lm)
+
+grid.arrange(plot1, plot2, ncol = 2)
+```
+
+Confirm with cor:
+
+```{r}
+# DO NOT EDIT THIS CHUNK
+mosaic::cor(Happiness ~ AverageSleep, data = sleep)
+mosaic::cor(Happiness ~ PoorSleepQuality, data = sleep)
+```
+
+b.  Which pair has stronger correlation?
+
+```{r, fig.width = 6.5}
+# DO NOT EDIT THIS CHUNK
+plot1 <- ggplot(sleep, aes(x = WeekdayBed, y = WeekdayRise)) + 
+     geom_jitter() + 
+  geom_smooth(se = FALSE, method = lm)
+plot2 <- ggplot(sleep, aes(x = WeekendBed, y = WeekendRise)) + 
+     geom_jitter() + 
+  geom_smooth(se = FALSE, method = lm)
+
+grid.arrange(plot1, plot2, ncol = 2)
+```
+
+Confirm with cor:
+
+```{r}
+# DO NOT EDIT THIS CHUNK
+mosaic::cor(WeekdayBed ~ WeekdayRise, data = sleep)
+mosaic::cor(WeekendBed ~ WeekendRise, data = sleep)
+```
+
+c.  Which pair has stronger correlation?
+
+```{r, fig.width = 6.5}
+# DO NOT EDIT THIS CHUNK
+plot1 <- ggplot(sleep, aes(x = Happiness, y = StressScore)) + 
+  geom_jitter() + 
+  geom_smooth(se = FALSE, method = lm)
+
+plot2 <- ggplot(sleep, aes(x = AnxietyScore, y = StressScore)) + 
+  geom_jitter() + 
+  geom_smooth(se = FALSE, method = lm)
+
+grid.arrange(plot1, plot2, ncol = 2)
+```
+
+```{r}
+# DO NOT EDIT THIS CHUNK
+mosaic::cor(Happiness ~ StressScore, data = sleep)
+mosaic::cor(AnxietyScore ~ StressScore, data = sleep)
+```
+
+### Guess the Correlation
+
+Since correlation has no contextual interpretation, we can get a feel for how this measure works using the [Guess the Correlation applet](https://www.rossmanchance.com/applets/2021/guesscorrelation/GuessCorrelation.html).
+Click on New Sample, enter a guess into the box (must be between -1 and 1) and click on Check Guess.
+Repeat this several times until you feel like you can guess pretty accurately.
+Hit the box for Track Performance and describe what this tells you.
+
+### Extra Practice 1: Anxiety and Stress
+
+```{r}
+ggplot(sleep, aes(x = AnxietyScore, y = StressScore)) + 
+  geom_jitter() + 
+  geom_smooth(se = FALSE, method = lm)
+
+
+fitline2 <- lm(StressScore ~ AnxietyScore, data = sleep)
+summary(fitline2)
+```
+
+-   Write the equation of the line:
+
+$$\widehat{StressScore} = ? +  ? \times AnxietyScore$$
+
+-   Predict stress score for someone with an anxiety score of 10 points.
+
+-   Find correlation between Stress and Anxiety scores.
+    Interpret the strength and direction of the relationship.
+
+```{r}
+mosaic::cor(StressScore ~ AnxietyScore, data = sleep)
+```
+
+### Extra Practice 2: Poor Sleep quality and Happiness
+
+```{r}
+ggplot(sleep, aes(x = PoorSleepQuality, y = Happiness)) + 
+  geom_jitter() + 
+  geom_smooth(se = FALSE, method = lm)
+
+
+fitline3 <- lm(Happiness ~ PoorSleepQuality, data = sleep)
+summary(fitline3)
+```
+
+-   Write the equation of the line:
+
+$$\widehat{?} = ? +  ? \times ?$$
+
+-   Predict Happiness for someone with a Poor sleep quality score of 5.
+
+-   Find correlation between Happiness and PoorSleepQuality.
+    Interpret the strength and direction of the relationship.
+    (Fill in the blanks and remove \#).
+
+```{r}
+# mosaic::cor(___ ~ ___, data = sleep)
+```

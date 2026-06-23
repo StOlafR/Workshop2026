@@ -1,0 +1,126 @@
+---
+title: "Mutating Joins"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+# Learning Goals:
+
+- Use left_join and full_join to join two datasets together  
+
+- For two small datasets, write out the result of their join
+
+-------------------------------------------------------
+
+```{r, message = FALSE,  warning=FALSE}
+library(tidyverse)
+```
+
+# Putting datasets together: Joins
+
+
+Joins allow you to bring datasets together. The two most common types of joins are:
+
+* `left_join`: Keeps all observations in the first (left) table, filling in NA if excluded in second table. Observations in ONLY the second table are dropped. *This is usually the default/most commonly used join*
+
+* `full_join`: Keeps all observations from either table, filling in NAs as needed. No observations are dropped. 
+
+Let's start by using in a small example:
+
+```{r}
+(students <- read_csv("~/Sds_101A_SSI26/Class/Data/students.csv"))
+(phones <- read_csv("~/Sds_101A_SSI26/Class/Data/phones.csv"))
+```
+
+We can bring `students` and `phones` together by doing a `left_join()`
+
+
+```{r}
+students |> left_join(phones)
+```
+
+Let's notice that the last row does not have information for the `brand` or `price` since `phones` does not have information for the *iphone 10*.
+
+
+We can bring `students` and `phones` together by doing a `full_join()`
+
+```{r}
+students |> full_join(phones)
+```
+
+Notice that the output has 5 rows, and the two last rows have incomplete information, the fourth row because `phones` does not have information about the *iphone 10*, and the fifth row because there are no students who have *galaxy s23+*
+
+# Your turn 1:
+
+
+1. Before running the code, predict what the dataset will look like. (How many rows? Which columns?)
+
+```{r}
+phones |> left_join(students)
+```
+
+
+2. Before running the code, predict what the dataset will look like. (How many rows? Which columns?)
+
+```{r}
+phones |> full_join(students)
+```
+
+
+3. Which join would I use if I wanted to see the average amount that students spent on their phones?  Write the code to calculate this average. 
+
+
+# Back to the Office
+
+For the next part of our activity let's load two datasets related to "The Office"
+
+```{r}
+(office_script <- read_csv("~/Sds_101A_SSI26/Class/Data/office_lines.csv"))
+
+(office_rating <- read_csv("~/Sds_101A_SSI26/Class/Data/office_ratings.csv"))
+```
+
+We have already described the `office_script` dataset, so let's note that `office_ratings` is an additional dataset that contains the average imdb rating for each of the episodes of the office.
+
+We will start by creating two datasets with the best 10 and worst top 10 rated episodes of the office. We can do that as follows
+
+```{r}
+(office_top10 <- office_rating |>
+  slice_max(imdb_rating, n=10))
+
+(office_bottom10 <- office_rating |>
+    slice_min(imdb_rating, n=10))
+```
+
+
+
+# Your turn 2:
+
+1. What does the following code do? Why did we use `left_join()` instead of `full_join()`?
+
+
+```{r}
+(character_top10 <- office_top10 |>
+  left_join(office_script) |>
+  group_by(character)|>
+  summarize(lines_top=n()) |>
+  arrange(-lines_top))
+```
+
+```{r}
+(character_bottom10 <- office_bottom10 |>
+  left_join(office_script) |>
+  group_by(character)|>
+  summarize(lines_bottom=n())  |>
+  arrange(-lines_bottom))
+```
+
+
+2. Create a table that will allow you to compare the number of times each character speaks in the top 10 and bottom 10 rated episodes of the office, makeing sure to consider only characters that appear at least 40 times in either top or bottom, and call the results `character_lines`. What trends do you observe?
+
+
+3. Create a graphical representation of the information from `character_lines`. Feel free to use the function `geom_text()` 
+

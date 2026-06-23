@@ -1,0 +1,59 @@
+---
+title: "Tidyverse review"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+# Learning Goals:
+
+- To practice basic transformations from tidyverse
+
+-------------------------------------------------------
+
+```{r, message = FALSE,  warning=FALSE}
+library(tidyverse)
+```
+
+
+# Your turn 0:
+
+Let's start our session by remembering what some common functions from the tidyverse do. 
+
+In your groups talk about what the following functions do and briefly summarize them below. After you are done writing, make sure to knit your .Rmd:
+
+* `mutate()`
+* `filter()` 
+* `summarize()`
+* `group_by`
+
+
+# Analyzing "The Office"
+
+Let's quickly pull our dataset for today, which contains the script information from the iconic show: The Office. 
+
+```{r}
+(office_script <- read_csv("~/Sds_101A_SSI26/Class/Data/office_lines.csv"))
+```
+
+The first three columns of the dataset correspond to the season, episode number, and episode name for an episode from The Office. The next columns correspond to the `character` who is speaking, the `text` lines that they are speaking, and finally we the `lenght_text` which measures how many letters the `text` has.
+
+
+# Your turn 1: Practice with the Office
+
+In your groups answer the following questions using R/tidyverse code
+
+
+1. How many times does Michael speak in the Office during season 1? How about in season 9? Which episode of season 9 featured Michael's comeback and what lines did he say?
+
+2. Start by subsetting your dataset to only lines uttered by Michael, Dwight, Jim, Pam, and Angela, and call this tibble `office_top5`. Use `office_top5` to count how many times lines each character had, and what was their median `length_text`
+
+3. Use `office_top5` to explore the median `length_text` across seasons for characters other than Michael until season 8. Any interesting trends?
+
+
+
+
+
+

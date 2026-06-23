@@ -1,0 +1,103 @@
+---
+title: "Connecting steps with pipes"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+# Learning Goals:
+
+-   Implement the data science process using tools from tidyverse
+
+-   Use the pipe operator to complete multi-step data tasks
+
+```{r}
+#| message: FALSE
+library(tidyverse)
+```
+
+# Your turn 0: Recordar es vivir
+
+In your groups answer the following questions as best as you can:
+
+1.  What command(s) did we use yesterday to visualize a dataset?
+
+2.  What command did we use to import a dataset from a .csv file?
+
+3.  What does the function `filter()` and the function `distinct()` do?
+
+4.  How about the functions `select()` and `mutate()`?
+
+# The data science process diagram
+
+Yesterday we covered the first four steps of the following diagram: ![DS process](http://r4ds.hadley.nz/diagrams/data-science/base.png).
+
+Let us illustrate this using an example from the penguins dataset. We are interested in visualizing the ratio between `flipper_length_mm` and `body_mass_g` for all *Adelie* penguins from the *Torgersen* island. To do this, we will:
+
+1.  Import our dataset using `read_csv()`.
+2.  We will filter our dataset using `filter()`.
+3.  We will create a new column with the ratio using `mutate()`.
+4.  We will visualize the ratio using `ggplot()` and `geom_hist()`
+
+Let's start by *importing* our dataset (step 1):
+
+```{r}
+penguins <- read_csv("~/Sds_101A_SSI26/Class/Data/penguins.csv")
+```
+
+Then, we will *transform* our dataset (steps 2 and 3 )
+
+```{r}
+penguins_sub <- filter(penguins, 
+                       species=="Adelie" & island=="Torgersen")
+penguins_ratio <- mutate(penguins_sub, 
+                         bmi=body_mass_g /flipper_length_mm)
+```
+
+And finally let's *visualize* `bmi`:
+
+```{r}
+ggplot(penguins_ratio, 
+       aes(x=bmi))+
+  geom_histogram(bins=15)
+```
+
+Although the previous code does the job, notice  we are creating lots of intermediate datasets which somehow are breaking our train of thought. A better approach is to use the pipe operator which allows to send the variable to the left of the pipe as the first argument of the function. We can recode our step 2 as follows:
+
+```{r}
+penguins_sub <- penguins |>
+  filter(species=="Adelie" & island=="Torgersen")
+```
+
+Finally, let's rewrite all of our code by chaining commands
+
+```{r}
+penguins |>
+  filter(species=="Adelie" & island=="Torgersen") |>
+  mutate(bmi=body_mass_g /flipper_length_mm) |>
+  ggplot(aes(x=bmi))+
+  geom_histogram(bins=15)
+```
+
+It is worth noting that:
+
+-   Functions that deal with tibbles (datasets) are chained together using pipes (`\>`).
+-   Functions that deal with plots are chained together using `+`.
+
+# Your turn 1:
+
+In your groups, use your `penguins` dataset to answer the following questions using the functions from the tidyverse and chaining/piping
+
+1.  Which species have a bill length higher than 55mm?
+
+```{r}
+
+```
+
+
+2.  Which species of penguins were found on Biscoe Island in 2007?
+
+3.  Create a a scatterplot comparing `bill_length_mm` vs `bill_depth_mm` for penguins for Adelie and Chinstrap penguins. Make sure to use different colors for each species by adding `color=species` as an argument in your aesthetics
+

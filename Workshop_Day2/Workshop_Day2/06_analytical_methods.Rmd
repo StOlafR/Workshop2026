@@ -1,0 +1,519 @@
+---
+title: "Inferential Methods in R"
+author: "Carlos Chávez"
+subtitle: "Statistical Analysis using R"
+output: 
+  pdf_document: default
+editor_options:
+  chunk_output_type: console
+  markdown: 
+    wrap: 72
+---
+
+
+# Learning Objectives
+
+1. Understand and apply different R functions for conducting common statistical tests.
+
+2. Read and interpret output from statistical analysis.
+
+3. Use R to create tables and figures of quantitative findings.
+
+
+# Overview of functions and packages
+
+Here is a list of all the packages that we will be using in this workshop. These packages contain different functions that we will be using to carry out analytical tasks. Functions require inputs (arguments) to process an output (result). 
+
+```{r Packages, echo=TRUE, message=FALSE}
+
+library(tidyverse) # Contains the most commonly used packages from the tidyr suite.
+library(knitr) # Contains the `kable()` function which is useful for creating nice tables
+library(kableExtra) # Additional table styling and options for `kable`
+library(mosaic) # Using `favstats` to get summary statistics and tables
+library(modelsummary) # If we have time - contains functions like tidy() and augment() which extract regression results in a tidy format. Also useful when creating tables of multiple models.
+
+```
+
+
+We will be using the `penguins` data set that comes with R for this portion of the workshop. This is a data set that we commonly use across SDS courses to demonstrate and practice with a variety of R functions.
+
+```{r Import Penguins Data}
+
+penguins <- palmerpenguins::penguins
+
+```
+
+
+# Methods of Analyses
+
+## T Tests
+
+
+There are a few functions we can use to conduct 1 and 2 sample t-tests. As a brief refresher, t-tests are a family of statistical tests that often used to evaluate if an observed mean statistically significant.
+
+### One Sample T-Test
+
+For a one-sample t-test we might ask:
+
+> Is the average body mass of penguins in 2008 different from the average body mass in 2007?
+
+The code below produces a table of summary statistics (i.e., sample size, mean, median, standard deviation, etc.) of body mass by year.
+
+```{r Summary statistics for body mass and year, echo=TRUE}
+
+favstats(body_mass_g ~ year, data = penguins)
+
+```
+
+We can also create a box plot that will visualize these differences.
+
+```{r  Box plot for body mass and year}
+
+
+penguins |> # Specify the data set
+  filter(
+    year != 2009, # Filter rows where year is not equal to 2009 and 
+    !is.na(body_mass_g)  # Filter rows where body_mass_g is not NA
+    ) |>
+  ggplot(aes(
+    x = body_mass_g,
+    fill = factor(year) # Make year a factor variable to group box plots
+             )
+         ) + 
+  geom_boxplot() + # Create a box plot layer
+  labs(
+    title = "Body Mass of Penguins by Year", # Add a title to my plot
+    x = "Body Mass (g)", # Rename x axis
+    fill = "Year" # Rename legend title
+    ) +
+  theme_classic()
+
+```
+
+We can conduct a one sample t-test using the `t.test` function
+
+In the `t.test` function there are three inputs.
+
+1.  The first is a formula to specify that we are only considering a single variable, `body_mass_g`, which is on the right hand side of the equation.
+2.  Second, we specify the data set so R knows where to look for the variable.
+3.  And third, we specify a null value to conduct the hypothesis test.
+
+
+```{r  One Sample T-Test, eval=FALSE}
+
+# Create a version of the penguins data set that only contains data from 2008
+penguins_008 <- penguins |> 
+  filter(year == 2008) 
+
+t.test(~ body_mass_g, data = penguins_008, mu = 4124.541)
+
+```
+
+1. What is the p-value?
+
+2. What is the 95% confidence interval?
+
+3. What is the sample mean of body mass?
+
+4. What can we conclude about the average penguin body mass in 2008?
+
+
+### Two Sample T-Test
+
+Keeping the same variable, `body_mass_g`, we might ask the question:
+
+> Does the average body mass of a penguin differ by sex?
+
+This question asks if the mean is different between two presumably independent samples of penguins (male and female penguins). 
+
+Just like before, we can create tables and figures to create an overview of the variables. 
+
+
+5. What should we type in the right hand side of the formula to get a summary table of body_mass_g by sex?
+```{r  Two sample t-test summary statistics, eval=FALSE}
+
+favstats(body_mass_g ~ , data = penguins, na.rm = TRUE)
+
+```
+
+
+6. Try making a box plot to display the difference in body mass by sex.
+```{r Box plot of body mass and sex}
+
+penguins |> 
+  drop_na(sex) |> 
+  ggplot(aes()) 
+
+```
+
+```{r two sample t test, echo=TRUE}
+
+t.test(body_mass_g ~ sex, data = penguins)
+
+```
+
+7. What is the p-value?
+
+8. What is the 95% confidence interval?
+
+9. What are the sample means of body mass?
+
+10. What can we conclude about the difference in average penguin body mass by sex?
+
+## Chi Squared Test
+
+Contingency tables or two-way tables are one way of displaying the number of counts between two categorical variables.
+
+While there are a variety of methods for analyzing categorical data - we will briefly cover the chi-squared test of independence. This statistical test is used when the inference of interest is whether the categories of one variable are independent of another. 
+
+For example, if we ask the question:
+
+> Does the number of penguins on an island differ by year?
+
+As a note, conducting a chi-squared test in R can be a bit tedious however there are alternative packages (see: `psych`) that are perhaps better suited to more advanced or nuanced applications of the chi-squared test.
+
+To conduct a chi-squared test:
+
+First, create a `table()` of two categorical variables. Then, pipe the table output to the `chisq.test()` function. 
+
+11. What variables do we need to specify in the `table` function? 
+
+Type them inside the parenthesis using the `data_name$variable_name` format.
+
+```{r table, eval = FALSE}
+
+table()
+
+```
+
+
+12. Try piping the table output to the `chisq.test()` function.
+
+```{r chisq test}
+
+
+
+```
+
+
+13. What conclusion can we make? Use the output to support your conclusion.
+
+
+
+## Analysis of Variance (ANOVA)
+
+If we have a numeric variable that is grouped by or explained by a categorical variable, and we want to know whether the means differ between groups, we can conduct an ANOVA.
+
+Once again, let us go back to the penguins data set. This time we will use island as an explanatory variable and bill depth as a response variable to answer the following question:
+
+> Does the average bill depth length of penguins differ by island?
+
+### Exploratory Data Analysis
+
+First, we will make a table to provide descriptive statistics. 
+
+```{r anova summary stats}
+
+# use favstats since bill_depth_mm is a numeric variable and we can easily get descriptive statistics. 
+mosaic::favstats(~ bill_depth_mm, data = penguins) 
+
+# we can use count() to get a table of frequencies for categorical variables like `island`. 
+penguins |>
+  count(island) 
+
+# However, we can incorporate both numeric and categorical variables into favstats to get descriptive statistics of a numerical response variable grouped by a categorical variable. 
+mosaic::favstats(bill_depth_mm ~ island, data = penguins) 
+```
+
+There are a couple of ways to visualize these descriptive findings. Feel free to explore and play around with different plot types. 
+
+14. Create a figure, using ggplot, to visualize the results from the descriptive statistics table.
+
+```{r figure for ANOVA, warning=FALSE, message=FALSE}
+
+
+
+```
+
+### Running ANOVA in R
+
+When we are ready to conduct ANOVA to answer our research question, we can use the following code to do that:
+
+```{r ANOVA code}
+
+aov(bill_depth_mm ~ island, data = penguins)
+
+```
+
+
+Notice that we use a similar formula notation for specifying the inputs of the ANOVA. Remember that we have bill_depth_mm as our response variable and island as an explanatory variable. Much like a formula or equation we are specifying a left hand side and a right hand side of the equation, and then adding an argument for the data set we are using. 
+
+```
+Left Hand Side ~ Right Hand Side 
+Response Variable ~ Explanatory Variable
+```
+
+The immediate output is not incredibly informative. It does not contain information about the statistical significance of the ANOVA results. 
+
+Often times it is more helpful to assign the model or statistical test as an object to our environment, and then use a function like `summary()` to get more detailed output. 
+
+```{r ANOVA summary}
+
+bill_anova <- aov(bill_depth_mm ~ island, data = penguins) # assign the ANOVA results to an object, bill_anova, to call upon later.
+
+summary(bill_anova) # Extract more detailed results of the ANOVA including
+```
+
+15. What conclusion can you make about the different group means? 
+
+If we want to identify which group mean is significantly different, we can use Tukey's Honest Significant Difference test to evaluate which pair of groups is different. This functions requires us to call up our ANOVA results we saved earlier:
+
+```{r Tukey Test}
+
+TukeyHSD(bill_anova) # Run a Tukey test using the ANOVA results
+
+```
+
+
+16. Based on the TukeyHSD, which groups are significantly different?
+
+17. Which pair has the largest mean difference?
+
+18. What is the 95% confidence interval for the Torgersen-Dream pair?
+
+
+## Linear Regression
+
+Next we will introduce how to do correlation and simple linear regression in R, extract results from a regression model, using R markdown to write 
+
+### Correlations
+
+Conducting correlations using the base R function is similar to how we make a table. 
+
+
+For example, a correlation between two variables this can be done doing the following:
+
+```{r correlation with base R}
+
+stats::cor(penguins$bill_depth_mm, penguins$bill_length_mm, use = "complete.obs")
+
+```
+
+Notice that when we have `NA` values we need to tell the correlation function that we want it to use only the rows that have complete data. 
+
+The `mosaic` package also has a function for running correlations that is set up similarly to the `favstats` function.
+
+```{r correlation with mosaic}
+
+mosaic::cor(bill_depth_mm ~ bill_length_mm, data = penguins, use = "complete.obs")
+
+```
+
+Correlations for multiple variables is a bit more involved, but can be done!
+
+```{r correlation matrix}
+
+penguins |> # specify data
+  drop_na() |> # drop missing values for simplicity
+  select(bill_depth_mm:body_mass_g) |> # selects only numerical variables
+  cor() # pipes data into the correlation function
+
+```
+
+
+### Simple Linear Regression
+
+If I want to evaluate how one variable is associated with another, I can conduct a linear regression. For example I might ask the question: 
+
+> Do penguins with bigger bill depths have a large body mass?
+
+Running a regression model is similar to the way we did ANOVA however this time we will use the `lm()` function. 
+
+
+```{r Regression}
+
+lm(body_mass_g ~ 1 + bill_depth_mm, data = penguins) 
+
+```
+
+```{r Regression Summary}
+
+fit1 <- lm(body_mass_g ~ 1 + bill_depth_mm, data = penguins) 
+summary(fit1)
+```
+
+19. What are the intercept and slope values? 
+
+20. What is the p-value for the slope?
+
+
+### Evaluating Regression Assumptions
+
+We can also plot the results of regression and create plots to assess the model assumptions.
+
+For linear regression we assume:
+
+a. Linear relationship between the response and explanatory variables.
+b. Independence of observations.
+c. Normally distributed residuals.
+d. Equal variance of residuals.
+
+There are several ways to look evaluate the regression assumptions of your model. However, we can easily evaluate the conditions for linear regression using the function `resid_panel` from the `ggResidpanel` package, which conveniently combines all the plots we can use to visually evaluate the regression assumptions. 
+
+```{r Resid Panels, message = FALSE, warning=FALSE}
+
+library(ggResidpanel) # Need this package to use the resid_panel function
+resid_panel(fit1)
+
+```
+
+
+### Multiple Linear Regression and Advanced Applications of Regression
+
+This is a quick introduction and example of more complex applications of the `lm` function. We may cover this in more detail on Day 3.
+
+Including multiple predictors to explain variability in the response or dependent variable
+
+```{r Complex Regression Examples}
+
+# Using a subset of the data (i.e. filtering data used in analysis) 
+
+lm(body_mass_g ~ 1 + bill_depth_mm, data = penguins, subset = year == 2007)
+
+
+# Including multiple covariates
+
+lm(body_mass_g ~ 1 + bill_depth_mm + flipper_length_mm + species, data = penguins)
+
+
+# Interaction effects between explanatory variables
+
+lm(body_mass_g ~ 1 +  bill_depth_mm  + flipper_length_mm + bill_depth_mm*species, data = penguins)
+
+
+# Exponentiation (squaring, cubing, etc.) variables
+
+lm(body_mass_g ~ 1 + bill_depth_mm^2, data = penguins)
+
+# Log transforming variables
+
+lm(body_mass_g ~ 1 + log(bill_depth_mm), data = penguins)
+```
+
+
+# Displaying Your Findings
+
+After conducting your analysis, you want to share your incredible findings with the world. To maximize interpretability of your results here are some things we can do.
+
+## Using R Markdown to write equations or Greek symbols.
+
+While not essential, it can be helpful to know that you can include mathematical equations and Greek symbols in R Markdown by wrapping `$$` around LaTex code to display equations and symbols. 
+
+For example, I can use:
+
+```
+$$
+\hat{y} = \beta_0 + \beta_1 X_1 + \epsilon
+$$
+```
+
+to display a regression equation:
+
+$$
+\hat{Body \ Mass} = \beta_0 + \beta_1 Bill \ Depth + \epsilon
+$$
+21. Try writing a regression equation for this model: 
+
+`lm(body_mass_g ~ 1 + bill_depth_mm + flipper_length_mm + species, data = penguins)` 
+
+
+# Supplementary Information
+
+## Creating Tables
+
+Here are some ways we can make easy and simple tables of the regression output in R.
+
+Using `knitr` and `kable`:
+
+```{r Tables with Kable}
+
+fit1 |> 
+  broom::tidy() |> 
+  kable()
+
+```
+
+The `modelsummary` function will produce a comprehensive table of your model results. This probably has more information than you will need depending on your model. The help documentation contains information for modifying the table based on your needs.
+
+```{r  Model Summary Table}
+
+modelsummary(fit1)
+
+```
+
+### Displaying Multiple Models 
+
+When you have multiple models that you want to display there are a couple more steps. First, we can assign multiple models into a list. Then, we can put the list of models into either function. 
+
+```{r multiple_models}
+
+# First, assign regression models to object
+fit1 <- lm(body_mass_g ~ 1 + bill_depth_mm, data = penguins)
+
+fit2 <- lm(body_mass_g ~ 1 + bill_depth_mm + flipper_length_mm + species, data = penguins)
+
+fit3 <- lm(body_mass_g ~ 1 +  bill_depth_mm  + flipper_length_mm + bill_depth_mm*species, data = penguins)
+
+# Combine objects into a list and assign it the name models 
+models <- list(fit1, fit2, fit3) # 
+
+# Call the object into the function modelsummary
+modelsummary(models)
+```
+
+
+## Creating Figures and Plots with Regression Output
+
+If you want to display the output from regression, you can use the `tidy()` function to create a tidy tibble of regression and plot them using `ggplot`. Using the models from the table above as an example:
+
+```{r Creating tidy output from regression data}
+
+# Create objects of tidy data from regression models, specify that we want confidence intervals
+fit1_tidy <- tidy(fit1, conf.int = TRUE)
+fit2_tidy <- tidy(fit2, conf.int = TRUE)
+fit3_tidy <- tidy(fit3, conf.int = TRUE)
+
+# Since the tidy data all contain the same number and names of columns, we can join them by binding their rows to make a complete data set. 
+## The .id argument provides an id column to link each row to its original data set.
+
+fit_plot <- bind_rows(fit1_tidy, fit2_tidy, fit3_tidy, .id = "fit")
+
+```
+
+Now that we have a tidy data set of our regression output, we can plot the regression coefficient along with error bars.
+
+For example, I may want to see how the slope for `bill_depth_mm` differs across models.
+
+```{r Table of bill depth across models}
+ 
+# Here I am filtering the data to show rows where my term is the slope of interest, then removing columns that I do not want to display in my table, lastly passing the transformed data frame to the kable function to make a table. 
+fit_plot |> 
+  filter(term == "bill_depth_mm") |> 
+  select(-c(std.error, statistic, p.value)) |> 
+  kable()
+```
+
+
+```{r fig-bill_depth_coefs}
+
+fit_plot |> 
+  filter(term == "bill_depth_mm") |> 
+  ggplot(aes(x = fit, y = estimate)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high)) +
+  labs(title = "Effect of Bill Depth (mm) on Body Mass (g) across Models",
+       x = "Model",
+       y = "Slope") +
+  theme_bw()
+
+```

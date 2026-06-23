@@ -1,0 +1,30 @@
+---
+title: "Code Styling"
+subtitle: "St. Olaf R Workshop - 2026"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+library(nycflights13)
+```
+
+
+Fix the following code chunk to be more readable. Don't worry about running or understanding all of the code. Feel free to check out [Chapter 4 in R for Data Science](https://r4ds.hadley.nz/workflow-style) for guidance.
+
+
+```{r}
+flights|>filter(dest=="IAH")|>group_by(year,month,day)|>summarize(n=n(),
+delay=mean(arr_delay,na.rm=TRUE))|>filter(n>10)
+
+flights|>filter(carrier=="UA",dest%in%c("IAH","HOU"),sched_dep_time>
+0900,sched_arr_time<2000)|>group_by(flight)|>summarize(delay=mean(
+arr_delay,na.rm=TRUE),cancelled=sum(is.na(arr_delay)),n=n())|>filter(n>10)
+```
+
+```{r}
+# An extra R chunk if you want to copy code here
+```
+
