@@ -1,0 +1,191 @@
+---
+title: "ANOVA: Mathematical Model and Post Hoc Tests"
+subtitle: "SDS 172"
+output:
+  pdf_document:
+    fig_height: 3
+    fig_width: 4.5
+  html_document: default
+  word_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+# Load libraries
+library(openintro)
+library(tidyverse)
+library(palmerpenguins)
+
+# Load Data
+penguins <- palmerpenguins::penguins
+```
+
+# Goals
+
+These are the main learning objectives of this worksheet:
+
+-   Understand the basic nature of F-statistic as it relates to variability in the data.
+
+-   Define conditions for using mathematical models for comparing many means.
+
+-   Read ANOVA table output from R and interpret key values.
+
+-   Practice performing post hoc tests (Tukey's HSD) for multiple comparisons of means.
+
+# Required Reading
+
+-   Read [Ch. 22.3-22.4 (pg 427-431)](https://openintro-ims.netlify.app/inference-many-means.html#mathANOVA).
+
+-   Complete the [ANOVA tutorial](https://rconnect.stolaf.edu/content/4d8ee0b8-65af-4d5d-994d-cf0942522094).
+
+# New Code
+
+This worksheet will use the following *new* R code:
+
++-----------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------+
+| Function                          | Arguments                                                                                                                                                                   | Use                                                        |
++:==================================+:============================================================================================================================================================================+============================================================+
+| `aov()`                           | -   `response ~ explanatory` - for comparing more than two means (or more accurately, a numeric response and categorical explanatory variable) we can use formula notation. | `flower_model <- aov(Petal.Length ~ Species, data = iris)` |
+|                                   | -   `data =` dataset name where variables live.                                                                                                                             |                                                            |
+|                                   | -   Note: We typically name the model and view the `summary` .                                                                                                              | `summary(flower_model)`                                    |
++-----------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------+
+| `TukeyHSD()`                      | -   `x =` an ANOVA model created using `aov()` .                                                                                                                            | `TukeyHSD(flower_model)`                                   |
+|                                   |                                                                                                                                                                             |                                                            |
+|                                   | -   `conf.level =` to change the confidence level for the adjusted error. Default is 95% and typically does not need to be changed.                                         |                                                            |
++-----------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------+
+| `mplot()` - from `mosaic` package | -   `object =` the output from `TukeyHSD()` to visualize two-way differences.                                                                                               | `mplot(TukeyHSD(flower_model))`                            |
++-----------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------+
+
+------------------------------------------------------------------------
+
+# Before class
+
+#### Background: Variability within and between groups.
+
+Analysis of variance (ANOVA) gets its name from the way we determine whether or not several groups have similar means. Mainly, we compare the variability **between** groups, to the variability **within** groups. When the overall variability between all groups is very similar to the variability of data with each group individually (like the fist image below), we get a smaller F-statistic (ratio of variabilities). This provides weak evidence of an actual difference for at least one of our groups. However, when the overall variability between data points from different groups is large in comparison to the variability within each group, the F-statistic is large and we can conclude that at least one group has a meaningfully different average (second image).
+
+![Figure 1. No difference in means.](anova_nodiff.png){width="300"}
+
+![Figure 2. Difference in means.](anova_diff.png){width="300"}
+
+
+(NOTE: when you save this document to your student folder, you will need to delete the images above in order for it to knit properly.)
+
+1.  What conditions must we check when conducting ANOVA for multiple means and how do we check them?  **See section 22.3.4 of textbook!**
+
+    -   Condition 1: 
+
+    -   Condition 2: 
+
+    -   Condition 3: 
+
+2.  What is the general format of the null and alternative hypotheses for performing ANOVA? You can write this out using words only, not symbols.
+
+$H_0$: 
+
+$H_A$: 
+
+
+#### Background: Palmer's Penguins
+
+![Palmer Penguins](palmer_penguins.png)
+
+
+
+Many different species of penguin live in Antarctica. Three of these species, Adelie, Chinstrap, and Gentoo, were randomly sampled over the course of three years (2007-2009) as part of a long-term research project. Measurements were made on various physical traits such as flipper length, bill depth, and overall body mass. Data were collected and made available by Dr. Kristen Gorman and the Palmer Station, Antarctica LTER, a member of the Long Term Ecological Research Network.
+
+Note: for more information on penguins, and a good visual comparison check out [oceanwide-expeditions.com](oceanwide-expeditions.com/blog/meet-all-6-antarctic-penguin-species).
+
+The R code below compares flipper length (mm) between the three species of penguins.
+
+```{r}
+ggplot(penguins, aes(x = species, y = flipper_length_mm, fill = species)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.1, alpha = 0.25) +
+  ggtitle("Flipper Length of Palmer Island Penguins") +
+  ylab("Flipper Length (mm)")
+
+ggplot(penguins, aes(x = flipper_length_mm, fill = species)) +
+  geom_histogram(bins = 20) +
+  facet_wrap(~species, nrow = 3) +
+  ggtitle("Flipper Length of Palmer Island Penguins") +
+  xlab("Flipper Length (mm)")
+
+mosaic::favstats(flipper_length_mm ~ species, data = penguins)
+```
+
+3.  Compare and contrast the flipper length for the three species using EDA only. CUSS for all three species.
+
+
+4.  Do you think, just from looking at the visualizations, that at least one species of penguin has a meaningfully different average flipper length? Do you think they are all different?
+
+
+5.  How would you write out the hypotheses for testing the mean flipper length of these three species of penguins?
+
+
+------------------------------------------------------------------------
+
+# In class Activity
+
+6.  At your tables, compare the hypotheses you came up with for question (5). As a group, use the code for EDA above to check the conditions for using ANOVA. Be sure to use specific details about the data to justify why or why not each condition is met.
+
+
+The code below fits the ANOVA model to this data and outputs the ANOVA table.
+
+```{r}
+penguin_model <- aov(flipper_length_mm ~ species, data = penguins)
+summary(penguin_model)
+```
+
+7.  What are the test statistic and p-value from the ANOVA table above?
+
+
+8.  Write a conclusion about the ANOVA test in the context of the data using the test statistic and p-value.
+
+
+## Post-hoc testing: Which groups are actually different?
+
+Often, the results of a significant ANOVA test leave us wondering, "*Which groups are actually different?*". A good way to approach this question is to compare all possible pairs of species, like running lots of two-sample t-tests to figure out which ones are different. But the problem with this approach is that the probability of committing a Type I error [incorrectly rejecting null hypothesis] increases when we run multiple tests at the same time. For example if each individual test has a Type I error of 5%, then running two tests simultaneously has a 9.75% chance of at least one error. Three tests has a 14.3% chance; 10 tests has a 40% chance that at least one test will commit a Type I error! So we need to adjust our significance level when we run multiple tests together at the same time. This is done automatically using an adjustment called Tukey's Honest Significant Differences (HSD) and the `TukeyHSD()` function. It allows us to view paired comparisons and adjusts p-values so we can read them like we normally would for a t-test (less than 0.05 is strong evidence of a difference).
+
+```{r}
+TukeyHSD(penguin_model)
+
+# a way to visualize the differences
+mosaic::mplot(TukeyHSD(penguin_model))
+```
+
+* diff: Difference in sample means (first group minus second group)
+
+* lwr, upr: lower and upper bounds of 95% confidence interval
+
+* p adj: p-value, adjusted for multiple comparisons. Interpret this as we would any other p-value!
+
+
+9.  Use the output from the Tukey HSD code above to determine which species have significantly different average flipper lengths.
+
+
+10.  Which two species have the largest difference in average flipper length? Interpret the 95% confidence interval for that difference.
+
+
+11. How does the `mplot` code visualize a meaningful difference? Where would the horizontal line be if two species did not have different mean flipper lengths?
+
+
+## Form and test your own hypothesis about penguins
+
+Consider the remaining variables in the `penguins` dataset. Choose a numeric response and a categorical explanatory variable (with more than 2 groups) to explore a different research question. 
+
+12. Copy and edit the code above to perform the EDA, check conditions, state the hypotheses, and run the ANOVA.
+
+```{r}
+# check out the other variables
+#?penguins
+# Run ANOVA for your own variables
+```
+
+13. Write a conclusion to your ANOVA from above in the context of the data.
+
+
+14. Did you reject the null hypothesis for your research question? If so, use `TukeyHSD` to determine which groups are different. If not, explain why it makes sense to stop the analysis here (and not use Tukey's HSD).
+
+

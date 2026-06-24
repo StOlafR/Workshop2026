@@ -1,0 +1,69 @@
+---
+title: 'St. Olaf R Workshop 2026'
+subtitle: 'Lesson Template'
+author: "YOUR NAME HERE"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+editor_options:
+  chunk_output_type: console
+---
+
+# Overview
+
+This is a template for you to use if you wish when transforming an existing lesson or lab into one that uses RStudio. Below you will see suggested sections that you may want to include, but feel free to make it your own. You can copy and paste code or anything else from previous workshop documents or start from scratch. Keep in mind that organizing your document using the formatting tools will help your students better navigate the lesson. If you plan to provide this as a pdf or html page for students, make sure you knit early and often to catch any bugs or issues. Facilitators and TAs will be floating around and available if you have any questions, just let us know!
+
+*A quick note on the code from lines 1-11. This is called the YAML and it provides necessary meta information about the document and how it will eventually be processed. `title`, `subtitle`, and `author` are all optional, can be edited, and are hopefully pretty straightforward. The `output` and `editor_options` tell RStudio what format to render the document into and where code output from the chunks should be displayed. These should be left alone in general, at least until you get a better feel for the options. You can always change the knitting format through the "Knit" drop-down button and the YAML will automatically update accordingly.*
+
+
+## Learning Outcomes
+
+*Suggestion: A short list of clear LOs for this activity.*
+
+## R functions used
+
+*Suggestion: A list or table of essential R functions to use or understand for this activity. Switch to "Visual" mode in the upper right corner of this file and you'll see options to insert tables, lists, etc.*
+
+## Setup
+
+*Suggestion: Load all necessary libraries and data. Provide comments on why we need each library.*
+
+```{r}
+#| label: load packages
+#| warning: FALSE
+#| message: FALSE
+
+
+```
+
+
+## Before Class
+
+*Suggestion: Are there any readings or work to be completed before class in order to complete this activity?*
+
+## In Class
+
+*Suggestion: Here's the good stuff, break up your code so each chunk has it's own purpose. Use subsections and text to supplement the code.*
+
+```{r}
+#| echo: FALSE
+
+# The option above will show the code output on rendered files but not the code.
+#   It's great for plots or tables when you don't need students to know the code.
+```
+
+### Subsection
+
+```{r}
+#| eval: FALSE
+
+# This option ensures that the code in this chunk is not evaluated when the file
+#   is rendered. Great for 'fill in the blank' code that would otherwise produce
+#   an error when knitting.
+```
+
+
+## Conclusions
+
+*Suggestion: What are the big picture questions your students should answer? What's the main takeaway from the lab? Or is there anything they need to do after class?*

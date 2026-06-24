@@ -1,0 +1,148 @@
+---
+title: 'SDS 172: Hello Data!'
+author: "YOUR NAME HERE"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+# Goals
+
+-   To practice using statistics vocabulary to describe datasets
+-   To become familiar with RStudio and be able to knit and save a markdown document.
+-   To be able to load and query a dataset using the RStudio Data interface.
+-   To use simple functions like `read_csv()`, `dim()` and `colnames()` to interact with a dataset.
+
+------------------------------------------------------------------------
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button, a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
+
+In part 1, we are not going to do any code, we will just modify the text of our document.
+
+## Saving your work
+
+As the instructor, ONLY I can edit and save documents in the `Class` folder. You can create, edit, and save files in your `Student` folder. So before we go any further:
+
+> Save a copy of 01_hello_data.Rmd to your `Student` folder using the **File \> Save As** option.
+
+Only you and the professor have access to this folder; it's the place you should take class notes and work on homework assignments.
+
+# Part 1: Vocabulary
+
+1.  Think about the [Film or Digital](https://pudding.cool/2018/08/filmordigital/) article you read before class. Does this describe an observational study or an experiment?
+
+2.  Which of the following would you consider the response variable: film/digital, year, director, budget, or genre?
+
+3.  In the following list, identify each variable as categorical or numeric:
+
+film/digital
+
+year
+
+director
+
+budget
+
+genre
+
+4.  Click "Help" up top and select "Markdown Quick Reference." Use the example to bold the words "response variable" in #2.
+
+5.  Italicize the name of each variable in #3.
+
+6.  Knit the document as a pdf.
+
+# Part 2: Interacting with Data!
+
+## Data Analysis with tables
+
+Let's start by loading a modified version of the dataset used for one of our first [readings](https://pudding.cool/2018/08/filmordigital/) by using the following R code.
+
+```{r,echo = FALSE, include = FALSE}
+
+library(tidyverse)
+
+movies <- read_csv("~/Sds_172_S26/Class/Data/movies.csv")
+```
+
+You can type normally here.
+
+-   The first line tells R that we are going to use all the functions that are in the package `tidyverse`. Inside the package `tidyverse` there is a multitude of useful functions, however in our example we will be only using the function `read_csv()`
+
+-   The second line creates the object `movies` from the output of the function `read_csv`. The function `read_csv` reads a table from a file path (notice how filepaths are enclosed by "") and produces a table or dataset.
+
+
+
+
+## Interacting with the dataset
+
+Notice how when you run this command you will have `movies` in the Environment window (often the upper left side of your screen). If you click on `movies` (**not on the play button**) you will be able to view this dataset similarly to a spreadsheet. In Statistics we refer to the rows of a dataset as *cases* (or *observations*) and to the columns as *variables* (or *features*).
+
+7.  How many cases (movies) are in this dataset?
+
+8.  How many variables are in this dataset?
+
+9.  Find `The Avengers` in this dataset and answer the following questions related to it:
+
+    a.  Who is the director?
+
+    b.  What year did it come out?
+
+    c.  What was the budget?
+
+10. By clicking on each variable (column) you can sort your dataset by that column. Use this method to answer the following questions about our `movies` dataset.
+
+    a.  What is the range of years from the movies in our dataset?
+
+    b.  Which is the most expensive movie? Which one is the cheapest movie?
+
+> Try knitting the document as a pdf again!
+
+It is a good idea to knit often. This makes it easier to figure out where the problem is if you have a mistake.
+
+## Simple functions for querying the dataset
+
+After loading our `movies` dataset we can query our dataset to learn how many cases (rows) and how many variables (columns) we have by using the command `dim` as follows:
+
+```{r}
+dim(movies)
+```
+
+In this case we have 1120 cases with 6 variables each. We can find the variable names as before using the `Data` environment, but alternatively we can figure them out by using the command `colnames()`:
+
+```{r}
+colnames(movies)
+```
+
+Notice that most of the names are self-explanatory, however you can find more information about this particular dataset [here](https://github.com/the-pudding/data/tree/master/filmordigital#top_directors_datacsv).
+
+# Conclusions
+
+In this worksheet we have learned the basics of how to interact with Rstudio by being able to knit, load a dataset, and obtain basic information about it.
+
+## A few terms to remember
+
+*R* is the programming language, the code.
+
+*RStudio* is the interface - all the windows and buttons we use to make things go.
+
+Sometimes you'll hear me (or other people) use the words interchangeably, to mean use R to do stuff in RStudio! :)
+
+The gray boxes are called code *chunks*, and everything inside them is *R* code. You can embed an R code chunk like this:
+
+-   Click the "Plus C" button above OR
+-   Mac: option + command + I
+-   PC: Ctrl + Alt + I
+
+Then this gray box appears and you can type code into it.
+
+```{r}
+
+
+```
+
+This file is an *R Markdown* document. The symbols you use to change bold, italics, and other formatting are *Markdown* syntax. The end of the file is *.Rmd*, that's how RStudio knows to treat it as an *R Markdown* file. We will always use this type of file in the class. Everything outside the code chunks (not in gray) is text (or formatting symbols).

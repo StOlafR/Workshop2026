@@ -1,0 +1,179 @@
+---
+title: "Creating a Lesson in R Markdown"
+output: pdf_document
+date: "2026-05-21"
+---
+
+# Introduction to creating a lesson in RStudio with R Markdown
+
+## Basic "rules" of a lesson in RStudio:
+
+1. The lesson is in a class folder on the RStudio server 
+2. The lesson is in an R Markdown document
+3. The code is written using the `tidyverse` package
+4. Each code chunk contains ~one "block" of code with explanation of the code above or below.
+
+
+## Setting up an R Markdown document 
+
+Writing a lesson in RMarkdown allows you to include text instructions and code in one place, and has the additional advantage of being able to "knit" the document to a variety of different file types such as a PDF or HTML document. 
+
+To create an new blank RMarkdown document go to `File > New File > R Markdown`
+
+### YAML Header 
+
+At the top of your R Markdown document, you'll notice some text in between three dashes (---). This is called a YAML (which stands for "YAML ain't markup language" -- yes, really) and it helps configure your whole R Markdown document. 
+
+You can take a look at all kinds of settings possible in a YAML header here: https://zsmith27.github.io/rmarkdown_crash-course/lesson-4-yaml-headers.html
+
+We recommend setting `output` to "pdf_document" so a pdf will be created when students knit the R Markdown. You can add settings such as `author`, a scroll-able table of contents, and other formatting settings which are all outlined in the link above. 
+
+### Necessary functions 
+
+In order to reduce the cognitive load on students who are likely using your R Markdown in a non-coding course, we find it useful to include the necessary functions students will be using at the beginning of your document. This way, students can refer to the top of the document as they work through any unfamiliar code. 
+
+Include the name of the function and the necessary arguments, as well as a description of the role of the function.  
+
+Here's an example of what this might look like (taken from one of our Statistics 1 lessons). 
+
+-   `summary(dataset)` provides a quick look at summary stats for all variables in a dataset at once
+
+-   `aov(fitline)` runs an ANOVA and calculates the sums of squares values for a regression line
+
+-   `lm(y ~ x, data = facebook)` fits a regression line and provides coefficient estimates (intercepts and slopes)
+
+    -   `y` is the response variable
+
+    -   `x` is the explanatory variable
+    
+
+### Set Up Chunk: Code to load necessary packages and data
+
+We also like to set students up for success by loading all necessary packages and data at the beginning of the document in a single code chunk. 
+
+When you create a Course in RStudio through r.stolaf.edu, the course set up will always be the same. The `Class` folder will contain two folders, one named `Code` and the other `Data`. We recommend you save all the data you want students to access in the `Data` folder as a CSV. 
+
+The file path to a specific CSV file will look something like this:
+
+  - ~/Sds_101A_SSI26/Class/Code/test_data.csv 
+  
+In which you specify the unique file path to your data file. 
+  
+In order for students to load that data into their R environment, include code that uses the `tidyverse` function `read_csv` to load the data: 
+
+```{r}
+
+#load necessary libraries:
+library(tidyverse)
+library(purrr)
+
+#load data
+#fake file path; code cannot run 
+
+#mydata <- read_csv("~/Sds_101A_SSI26/Class/Code/test_data.csv")
+
+```
+
+In the above example, a object called `mydata` would appear in student's R environments 
+
+
+### Optional: Learning Objectives
+
+Including learning objectives at the beginning of a lesson is always a good idea! Learning objectives help students understand the expectations for the lesson or worksheet and are shown to improve learning outcomes (https://pmc.ncbi.nlm.nih.gov/articles/PMC9582829/)
+
+
+## R Markdown Syntax 
+
+Organizing your R Markdown document using headers makes it easier for students to navigate your document and improves readability after knitting. When you use headers, students can navigate the R Markdown using the Outline functionality in RStudio. 
+
+### Some syntax tips and tricks 
+
+The number of "hashtags" or "pound signs" that you include before a header control how large the font will be: 
+
+# One Hashtag
+## Two Hashtags
+### Three Hashtags    
+#### Four Hashtags 
+
+
+Underscores and star symbols control italicizing or creating bolded font: 
+
+*italic*   **bold**
+
+_italic_   __bold__
+
+You can create ordered and unordered lists: 
+
+Unordered List:
+
+* Item 1
+* Item 2
+    + Item 2a
+    + Item 2b
+    
+Ordered List:
+
+1. Item 1
+2. Item 2
+3. Item 3
+    + Item 3a
+    + Item 3b
+    
+You can easily include links: 
+
+check out some [more R Markdown tips!](https://rmarkdown.rstudio.com/authoring_basics.html) 
+
+To include an image, you need to save your image in your Course folder and include the path to the image. We recommend creating a folder in the `Class > Code` folder called `images`. 
+
+<!-- ![the tidyverse hex sticker](~/Sds_101A_SSI26/Class/Code/Workshop_Day3/images/hex_image.png) -->
+
+### Inserting a Table
+
+There are many, many ways to insert a table in an R Markdown. One way is to code the table "by hand", which can be useful for small tables, or for tables with a lot of text: 
+
+First Header  | Second Header 
+------------- | ------------- 
+Content Cell  | Content Cell
+Content Cell  | Content Cell
+
+There are many fuctions that allow you to insert tables created from data living in your environment. For example, let's include a table of the first 10 rows of the  `penguins` data set using the function `kable` from the `knitr` package: 
+
+```{r}
+library(palmerpenguins)
+data(penguins)
+
+knitr::kable(penguins[1:10,], caption = "The first 10 rows in the penguins dataset") #the [1:10,] specifies we just want to print rows 1 through 10. 
+
+```
+
+## Setting Chunk Options 
+
+At the top of each R code chunk, you will see `{r}`. Inside the curly brackets, you can include additional settings that control how the code block will behave and how the content will appear in your final rendered document. Here are some useful options:
+
+Option  | Default | Effects  
+------- | ------ | ----------- 
+`eval`  | `TRUE` | Determines if the code inside the code chunk is run. Useful if you want to show example code, but not run it.  
+`echo`  | `TRUE` | Controls whether the source code itself is displayed in the final document. Useful if you want to display a plot, but not the code to create the plot
+`include` | `TRUE` | If `FALSE`, runs the code but hides both the code and all of its outputs from the document.
+`message` | `TRUE` | If `FALSE` prevents informational messages (like package loading notes) from printing.
+`warning` | `TRUE` | Set to `FALSE` to hide execution warning messages from appearing.
+
+
+## Some considerations for teaching code in a non-coding class 
+
+1. Reduce the cognitive load of students by writing the simplest code that still conveys the concepts.
+
+2. Be extremely consistent in the functions, the formatting, and the coding syntax you use throughout the document and similar lessons. 
+
+3. Be sure to build in time for students to get introduced to RStudio. Similar to what we did for the first hour of this workshop, student's will not be able to jump right into coding or even saving a file! 
+4. Write lessons to emphasize the content, not the code. We find that explicitly writing out learning objectives helps cut out unnecessary or over complicated code. 
+
+
+
+
+
+
+
+
+
+

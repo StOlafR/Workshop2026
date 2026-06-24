@@ -1,0 +1,408 @@
+---
+title: "Spring 2026 Exam 3"
+subtitle: "SDS 164 Data Science 1"
+format: 
+  pdf: 
+    fontsize: "12pt" 
+    extra_dependencies: float 
+    include-in-header:
+      - text: |
+          \usepackage{scrlayer-scrpage}
+          \usepackage{ucharcat}
+          \usepackage{float}
+          \floatplacement{table}{H}
+          \usepackage{lipsum} 
+          \usepackage{subcaption}
+          \renewcommand{\thesubfigure}{}
+          \renewcommand{\thesubtable}{}
+          % Optional: remove spaces/parentheses
+          \captionsetup[table]{labelformat=empty}
+          \captionsetup[subtable]{labelformat=empty}
+          \clearpairofpagestyles
+          \ofoot*{\pagemark}
+          \cfoot{}
+editor: source
+editor_options: 
+  chunk_output_type: console
+---
+
+\vspace{-.5cm}
+
+*I pledge my honor that on this examination I have neither given nor received assistance not explicitly approved by the professor and that I have seen dishonest work.*
+
+\vspace{1cm}
+
+Name: \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\
+
+\vspace{1cm}
+
+Signature: \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ Date: \_\_\_\_\_\_\_\_\_\_\_\_
+
+\vspace{1cm}
+
+I have intentionally not signed the pledge \_\_\_\_ (check box if appropriate)
+
+```{r}
+#| label: Setup
+#| include: false
+#| warning: false
+#| message: false
+
+knitr::opts_chunk$set(fig.pos = "H", out.extra = "")
+library(tidyverse)
+library(gapminder)
+library(ggthemes)
+library(ggridges)
+library(ggmosaic)
+library(forcats)
+library(lubridate)
+library(viridis)
+library(DT)
+library(unvotes)
+library(knitr)
+library(kableExtra)
+
+# Exam 3 is worth 50 points
+# ~15 questions 
+
+
+```
+
+```{r}
+#| label: Data
+#| include: false
+#| warning: false
+#| message: false
+data1 <- data.frame(c1 = 1:5,
+                    c2 = 1:5,
+                    c3 = 1:5,
+                    c4 = 1:5,
+                    c5 = 1:5)
+
+stock_prices <- read_csv("~/Sds_164_S26/Class/Data/stock_prices.csv")
+example_books <- read_csv("~/Sds_164_S26/Class/Data/example_books.csv")
+
+q_fifteen <- list(
+  tibble(
+    Time = c("4 min", "3 min", "1 min")
+    ),
+  tibble(
+    p.value = c(1e-16, 2e-4, 5e-1)
+    ),
+  tibble(
+    Message = c("Ten Four","Negative","Watch your six")
+    )
+)
+
+exam <- data.frame(
+  Student = c(rep("Student A", 3),
+              rep("Student B", 3),
+              rep("Student C", 3)),
+  Question = c(rep(paste("Question", 1:3))),
+  Response = rbinom(9, size = 1, p = .5)) |> 
+  mutate(Response = case_when(Response == 1 ~ "correct",
+                              .default = "incorrect"))
+
+df_x <- data.frame(id = c(1:3),
+                    x = c("X1", "X2", "X3")) 
+
+df_y <- data.frame(id = c(1,2,2,4),
+                     y = c("Y1", "Y2", "Y2", "Y4"))
+
+df_z <- data.frame(id = c(1,3,3),
+                   x = c("X1", "X3", "X3"),
+                   z = c("Z1", "Z3", "Z3"))
+
+tbl_left <- left_join(df_x, df_y, join_by(id))
+tbl_right <- right_join(df_y, df_z, join_by(id))
+
+tbl_full <- full_join(df_x, df_y, join_by(id))
+
+tbl_semi <- semi_join(df_x, df_z, join_by(id))
+```
+
+\newpage
+
+**Refer to the chunk of code below for Questions 1 and 2.**
+
+```{r}
+#| label: Problem 1
+#| eval: false
+my_data   data.frame(x = "001", y = 1:3, z = c("A","B","C")) # <1>
+write_csv(       , file = "~/Sds_164_S26/Data/data_name.csv") # <2> 
+my_data |> pivot_wider(names_from = y, values_from = y) # <3> 
+read_csv(my_data) # <4>
+```
+
+###### Question 1) Identify and correct three mistakes in the code above. \[6pts\]
+
+\vspace{1.75cm}
+
+###### Question 2) Match the line number from the code above to the appropriate steps. \[4pts\]
+
++--------------------------------------+-------------+
+| Step                                 | Line Number |
++======================================+:===========:+
+| 1.  Create a data frame.             |             |
++--------------------------------------+-------------+
+| 2.  Save the data.                   |             |
++--------------------------------------+-------------+
+| 3.  Read the data in to R.           |             |
++--------------------------------------+-------------+
+| 4.  Pivot the data into wide format. |             |
++--------------------------------------+-------------+
+
+\newpage
+
+###### Question 3) Refer to the warning message below for the following questions. \[4pts\]
+
+-   Why did we receiving this warning message?
+
+\vspace{3cm}
+
+-   What does this warning message tell us about the results from `parse_number`?
+
+\vspace{3cm}
+
+
+
+```{r}
+#| label: Question 3
+#| eval: true
+#| warning: true
+#| echo: false
+#| attr-source: '.numberLines'
+
+example_books |> 
+  slice_tail(n = 3) |> 
+  mutate(likes = parse_number(likes))
+
+```
+
+\newpage
+
+###### Question 4) Refer to the code chunk below to answer the following questions \[6pts\]:
+
+```{r}
+#| label: Question 4
+#| eval: false
+example <- function(x, y){
+  z <- x / sqrt(y)
+  return(z)
+}
+example(x, y)
+```
+
+-   What inputs are needed for the function to run without producing an error message?
+
+\vspace{4cm}
+
+-   How would you describe the process that the function is written to do?
+
+\vspace{4cm}
+
+-   Would you expect the function to output a vector, data frame, or single value?
+
+\vspace{3cm}
+
+\newpage
+
+###### Question 5) Complete the code to pivot the tibble into a wide format, then draw what the resulting wide data would look like. \[6pts\]
+
+*Hint*: Assume that each observation should be a student.
+
+::: {.column layout-ncol="2"}
+```{r}
+#| label: Question 5
+#| echo: FALSE
+print(as_tibble(exam))
+```
+
+<div>
+
+```         
+exam |>
+  pivot_wider(
+  
+      names_from = 
+      
+      values_from =
+      
+      )
+      
+      
+      
+    
+```
+
+</div>
+:::
+
+\vspace{1.75cm}
+
+\newpage
+
+##### Directions: For Questions 6 to 10 refer to the tables below. The top 3 tables are unjoined datasets. The bottom 4 tables contain the results from joining 2 datasets (e.g., "Joined Data E" is the result of the anti_join of X and Y).
+
+::: {#tbl-panel1 layout-ncol="3" layout-nrow="1"}
+|  id | X   |
+|----:|:----|
+|   1 | X1  |
+|   2 | X2  |
+|   3 | X3  |
+
+: Dataset X {#tbl-X}
+
+|  id | Y   |
+|----:|:----|
+|   1 | Y1  |
+|   2 | Y2  |
+|   2 | Y2  |
+|   4 | Y4  |
+
+: Dataset Y {#tbl-Y}
+
+|  id | X   | Z   |
+|----:|:----|-----|
+|   1 | X1  | Z1  |
+|   3 | X3  | Z3  |
+|   3 | X3  | Z3  |
+
+: Dataset Z {#tbl-Z}
+
+Unjoined Datasets
+:::
+
+::: {#tbl-panel2 layout-ncol="2" layout-nrow="2"}
+|  id | X   | Y    |
+|----:|:----|:-----|
+|   1 | X1  | Y1   |
+|   2 | X2  | Y2   |
+|   2 | X2  | Y3   |
+|   3 | X3  | `NA` |
+
+: Joined Data A {#tbl-A}
+
+|  id | X    | Y    |
+|----:|:-----|:-----|
+|   1 | X1   | Y1   |
+|   2 | X2   | Y2   |
+|   2 | X2   | Y3   |
+|   3 | X3   | `NA` |
+|   4 | `NA` | Y4   |
+
+: Joined Data B {#tbl-B}
+
+|  id | Y    | X   | Z   |
+|----:|:-----|:----|:----|
+|   1 | Y1   | X1  | Z1  |
+|   3 | `NA` | X3  | Z3  |
+|   3 | `NA` | X3  | Z3  |
+
+: Joined Data C {#tbl-C}
+
+|  id | X   |
+|----:|:----|
+|   1 | X1  |
+|   3 | X3  |
+
+: Joined Data D {#tbl-D}
+
+Joined Datasets
+:::
+
+###### Question 6) What is a 'key' used for when joining data? \[3pts\]
+
+*Provide a brief response, two to three sentences, using the tables above as a reference.*
+
+\newpage
+
+###### Question 7) Joined Data D is the result of a `semi_join` between which two datasets? \[4pts\]
+
+\vspace{4cm}
+
+###### Question 8) What are two aspects of Joined Data C that indicate it is the result of a `right_join` between Dataset Y and Dataset Z? \[4pts\]
+
+\vspace{4cm}
+
+###### Question 9) Which Joined Datasets are examples `mutating_joins` and which are examples of `filtering_joins`? \[4pts\]
+
+\vspace{4cm}
+
+###### Question 10) Why does Joined Data B have missing values for id = 4 in the X column and id = 3 in the Y column? \[4pts\]
+
+\vspace{4cm}
+
+\newpage
+
+###### Question 11) Which of the following is the best reason for using long formatted data? \[1pt\]
+
+a.  Having more observations and fewer variables is better.
+b.  Longer data are easier for humans to read than wider data.
+c.  It is easier to visualize and analyze long format data.
+
+###### Question 12) Which of the following best describes one-to-one relationships? \[1pt\]
+
+a.  One row in X matches to one row in Y.
+b.  One row in X matches to many rows in Y.
+c.  One row in X increases the rows in Y.
+
+###### Question 13) A `filtering_join` such as `anti_join` or `semi_join` is likely to have what effect when joining data? \[1pt\]
+
+a.  Filtering joins may remove everything but the unique values in a column.
+b.  Filtering joins may increase the number of columns when joining data.
+c.  Filtering joins may reduce the number of rows when joining data.
+
+###### Question 14) Which of the following statements best describes tidy data? \[1pt\]
+
+a.  Data that are tidy should be able to pick up after themselves and minimize their residuals without a trace.
+b.  Data that are tidy have variables in their own columns, observations in their own rows and a single value in each cell.
+c.  Data that are tidy should should only be in the long format so as to avoid being redundant.
+
+###### Question 15) Which example best fits the need to use a function like `parse_number`? \[1pt\]
+
+\vspace{.5cm}
+
+::: {.column layout-ncol="3"}
+```         
+a. 
+  Time 
+  <chr>
+1 4 min 
+2 3 min 
+3 1 min 
+```
+
+```         
+b.
+  p.value
+    <dbl>
+1   1e-16
+2   2e- 4
+3   5e- 1
+```
+
+```         
+c.
+  Message       
+  <chr>         
+1 Ten Four      
+2 Negative      
+3 Watch your six
+```
+:::
+
+\newpage
+
+## Extra Credit
+
+Use the `rename()` function to give this penguin a new name and then use `ymd()` to give them a birthdate. Feel free to give the penguin some color, mutate the penguin a new hat, or a friend. \[+1pt\]
+
+```{r}
+#| eval: false
+penguin |> 
+  rename("                           " = NULL) |> 
+  mutate(birthdate = ymd(                   ))
+```
+
+![](penguin.png){height="50%" fig-align="center"}

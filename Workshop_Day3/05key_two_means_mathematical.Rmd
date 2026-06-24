@@ -1,0 +1,267 @@
+---
+title: "Inference for Two Means - Mathematical Model"
+subtitle: "SDS 172"
+output:
+  pdf_document:
+    fig_height: 3
+    fig_width: 4.5
+  html_document: default
+  word_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE,warning=FALSE,message=FALSE)
+
+library(tidyverse)
+
+# Load Data
+notetaking <- read_csv("~/Sds_172_S26/Class/Data/notetaking.csv")
+```
+
+# Goals
+
+These are the main learning objectives of this worksheet:
+
+-   Extend the t-test to compare the difference in two means.
+
+-   Define conditions for independent samples t-tests.
+
+-   Create and interpret confidence intervals for the difference in two means.
+
+# Required Reading
+
+-   Read chapter [Ch. 20.3-20.5](https://openintro-ims.netlify.app/inference-two-means.html#math2samp).
+-   Read the [Laptop vs. Longhand article](https://drive.google.com/file/d/1z73VfLEwXOrFSS5_FA3aN8vHuxDpK-Ds/view?usp=share_link) (read only Study 1, and don't worry about the specifics of the statistical analysis).
+-   Complete the [Inference for two means tutorial](https://rconnect.stolaf.edu/content/1a51f07d-fce7-4e09-86bf-577baf1ab608).
+
+# New Code
+
+This worksheet will use the following *new* R code (see code from *01_one_mean.Rmd* for more useful R code):
+
++------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------+
+| Function   | Arguments                                                                                                                                                    | Use                                                                                 |
++:===========+:=============================================================================================================================================================+=====================================================================================+
+| `t.test()` | -   `response ~ explanatory` - for comparing two means (or more accurately, a numeric response and binary explanatory variable) we can use formula notation. | 1.  Two independent means:                                                          |
+|            | -   `data =` dataset name where variables live.                                                                                                              |                                                                                     |
+|            | -   `mu =` null mean value, default is `0` which is typically what we test for the difference in means.                                                      | `t.test(height ~ sex, data = Galton, alternative = "two.sided", conf.level = 0.99)` |
+|            | -   `alternative =` specify the alternative hypothesis, can use `"two.sided"` (default), `"greater"` , or `"less"`                                           |                                                                                     |
+|            | -   `conf.level =` change the percentage of confidence, default is `0.95`                                                                                    |                                                                                     |
++------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------+
+
+------------------------------------------------------------------------
+
+# Before class
+
+#### Central Limit Theorem
+
+With the comparison of two independent means (as opposed to paired means), we have a **numeric response** variable and a **categorical explanatory** with two groups. These are the groups for which we would like to compare means. The goal is to test/estimate the difference in population means, $\mu_1-\mu_2$, so our estimate from the difference in sample means, $\bar{x}_1-\bar{x}_2$. And the standard error is estimated as $\sqrt{\frac{s_1^2}{n_1}+\frac{s_2^2}{n_2}}$. Recall that since we are also estimating population standard deviations ($\sigma_1$ and $\sigma_2$), we must once again use the t-distribution to account for the extra uncertainty. The degrees of freedom for this t-distribution will typically be calculated for us in R, but using the smaller of $n_1-1$ or $n_2-1$ is an acceptable conservative option.
+
+1.  What conditions must we check before conducting a two sample t-test and how do we check them?
+
+    -   Condition 1: Independence of observations, and indepdence between groups (separate groups)
+
+    -   Condition 2: No outliers if n<15; not many outliers if n>30. Also, no strong skew, regardless of sample size. (Check using histogram of data within each group.)
+    
+
+#### Background: Laptops vs. Longhand
+
+How do you take notes in class? Do you think there is a difference in how well you learn if you take notes using a laptop versus writing them out longhand? Answering this question was the goal of a set of experiments by Mueller and Oppenheimer in 2014. Read the **first two pages** of the study linked above (also available on Moodle) and answer the following questions.
+
+2.  Who participated in Study 1? Do you think this group is a good representation of all students? Why or why not?
+
+*The students are from Princeton University, which is probably not representative of all students since it is an elite private college.*
+
+3.  How was it determined whether subjects would use laptops or longhand to take notes? Would you describe this procedure as an experiment or observational study?
+
+*The researchers determined it by leaving only laptop or only notebook for note taking. This is an experiment. (Students were instructed to use the normal classrom note-taking strategy, but the conditions were assigned, presumably randomly. This is not 100% clear so you would have a good argument it you said this was an observational study.)*
+
+4.  What two types of questions were asked after watching the lectures?
+
+*Factual questions and conceptual questions.*
+
+
+Below is a subset of the variables collected from this study. Note that the researchers analysed the standardized scores from each participant, we will use the raw, original scores from their assessment. We'll focus on the following variables:
+
+-   `treatment`: Laptop/Longhand
+
+-   `fact_raw`: raw score from factual questions
+
+-   `concept_raw`: raw score from conceptual questions
+
+Notice that we will do TWO analyses: one with factual score as response, and a separate analysis with conceptual score as response. For both analyses, we will use treatment as the explanatory variable.
+
+Below are some graphs that show the distribution of factual scores and the distribution of conceptual scores for each group. You can run these chunks, then use them to answer number 5 below!
+
+Simple graphs:
+
+```{r}
+ggplot(notetaking, aes(x = fact_raw)) +
+  geom_histogram(bins = 8) + 
+  facet_grid(treatment~.) + 
+  labs(title = "factual")
+```
+
+```{r}
+ggplot(notetaking, aes(x = concept_raw)) +
+  geom_histogram(bins = 6) + 
+  facet_grid(treatment~.) + 
+  labs(title = "conceptual")
+```
+
+Fancy graphs! :
+
+```{r}
+ggplot(notetaking, aes(y = fact_raw, x = treatment, fill = treatment)) +
+  geom_boxplot(width = 0.25) +
+  geom_violin(alpha = 0.25) +
+  geom_jitter(width = 0.05, alpha = 0.5) +
+  theme(legend.position = "none") +
+  labs(title = "Factual question scores - Laptop vs. Longhand",
+       x = "Treatment",
+       y = "Factual scores") + coord_flip()
+```
+
+```{r}
+ggplot(notetaking, aes(y = concept_raw, x = treatment, fill = treatment)) +
+  geom_boxplot(width = 0.25) +
+  geom_violin(alpha = 0.25) +
+  geom_jitter(width = 0.05, alpha = 0.5) +
+  theme(legend.position = "none") +
+  labs(title = "Conceptual question scores - Laptop vs. Longhand",
+       x = "Treatment",
+       y = "Conceptual scores") + coord_flip()
+```
+
+Summary Stats:
+
+```{r}
+mosaic::favstats(fact_raw ~ treatment, data = notetaking)
+mosaic::favstats(concept_raw ~ treatment, data = notetaking)
+```
+
+5.  Use the R code above to perform some EDA for the note taking data. What are the mean scores for each group? What are the differences in means for factual and conceptual questions? Does either difference seem meaningful?
+
+*Factual (longhand vs. laptop): means were 6.4 vs. 5.6; SDs were 2.8 vs. 2.2.  Longhand had slightly higher scores and more variability*
+
+*Conceptual (longhand vs. laptop): means were 4.3 vs. 2.8; SDs were 1.5 vs. 1.2.  Longhand had definitely higher scores and slightly more variability*
+
+
+------------------------------------------------------------------------
+
+# In class Activity
+
+6.  Select someone at your table to share their screen to the TV and run the EDA code above. Take a few minutes to discuss your thoughts from question (5). Is there a meaningful difference between laptop and longhand note takers for either type of question? What difference in means would YOU consider meaningful (1 pt difference, 5pt, more...)?
+
+
+7.  Now check the EDA to consider whether the conditions from question (1) would reasonably be satisfied for this data. Provide compelling reasons why they would or would not be met.
+
+*1. independence from randomized experiment and knowing 1 person's score should not impact another's*
+
+*2. we appeal to the Central Limit Theorem for the normality of means, since we have a medium-sized sample in both groups and there seems to be no big outliers*
+
+
+Let's focus on the factual questions first. We will start by testing whether the true average score on factual questions is similar between laptop and longhand note takers.
+
+$H_0:\mu_{laptop}-\mu_{longhand}=0$: There is no difference in the mean score of laptop and longhand note takers, how you take notes doesn't affect how well you retain factual information.
+
+$H_a:\mu_{laptop}-\mu_{longhand}\ne0$: There is a difference in the means scores. How well you retain factual information does depend on the type of notes you take.
+
+The code below calculates the test statistic and p-value by hand.
+
+```{r}
+# summary stats of fact_raw from favstats above 
+xbar_lap <- 5.58
+xbar_long <- 6.41
+sd_lap <- 2.23
+sd_long <- 2.84
+n_lap <- 31
+n_long <- 34
+
+# point estimate, standard error, and null difference
+point_est <- xbar_lap - xbar_long  # diff in sample means
+SE <- sqrt( (sd_lap^2/n_lap) + (sd_long^2/n_long) )
+null_diff <- 0
+
+# test stat and p-value
+t_score <- (point_est - null_diff) / SE
+t_score
+pt(t_score, df = 30)*2  #two-sided p-value
+```
+
+8.  Using the test statistic and p-value, write a statement about the difference in factual understanding when note are taken using a laptop versus longhand.
+
+*There is not significant evidence (T = -1.32, p-value = .198) there is a difference in factual understanding when notes are taken using a laptop versus longhand; mean scores are not significantly different between laptop and longhand notetakers.*
+
+
+9.  The code below calculates the 95% confidence interval for the true difference in mean factual scores. Write an interpretation of this interval and make a connection to the hypothesis test conclusion you made in question (8).
+
+```{r}
+# find the t* multiplier
+qt(0.025, df = 30)  # -2.04
+qt(0.975, df = 30)  # 2.04
+
+2.04 * SE             # margin of error = 1.29
+
+point_est - 2.04 * SE        # lower bound
+point_est + 2.04 * SE        # upper bound
+```
+
+*We are 95% confident that mean factual scores for laptop note takers are between 2.12 points lower and 0.46 points higher than longhand note takers.  Note that our CI contains 0, so that having no mean difference in the population is plausible, or consistent with our data, and we do not reject Ho.*
+
+
+The same hypothesis test and confidence interval can be conducted using `t.test()` as shown with the code below. Take note that there are slight variations in values due to a more accurate calculation of the degree of freedom for the t-distribution using the R function.
+
+```{r}
+t.test(fact_raw ~ treatment, data = notetaking)
+```
+
+
+10. Let's turn our focus to the conceptual questions now.
+
+    -   Use the EDA for `concept_raw` to check the conditions for inference.
+
+    -   Write out the null and alternative hypotheses using symbols and words.
+
+    -   Alter the `t.test()` code above to work for the new variable.
+
+    -   Interpret the hypothesis test and confidence interval in the context of this study.
+
+*As seen in EDA above, there is some skewness, but since sample size is greater than 30, we can proceed. *
+
+*$H_0:\mu_{laptop}-\mu_{longhand}=0$: There is no difference in the mean score of laptop and longhand note takers, how you take notes doesn't affect how well you retain CONCEPTUAL information.*
+
+*$H_a:\mu_{laptop}-\mu_{longhand}\ne0$: There is a difference in the mean scores. How well you retain conceptual information does depend on the type of notes you take.*
+
+```{r}
+t.test(concept_raw ~ treatment, data = notetaking)
+```
+
+*We have statistically significant evidence that the average score in recording conceptual information is higher for the longhand group than the laptop group (T(62.4) = -4.50, p-value < 0.0001). *
+
+*We are 95% confidence that conceptual scores are between 0.8 and 2.2 points higher, on average, in the longhand group than the laptop group. *
+
+------------------------------------------------------------------------
+
+# Conclusion
+
+11. Think back to question (3). Is it appropriate to say that taking notes longhand or with a laptop will cause better retention of information?
+
+*Yes, because the notetaking method/condition was assigned (presumably randomly).*
+
+
+12. What other confounding variables might contribute to both how someone takes notes and how well they retain information. Briefly look at the description of Study 2 and Study 3 in the article to see if either addresses these (or different) confounders and discuss at your table.
+
+*Other variables might be the way in which students take notes (e.g. copying verbatim or putting things in their own words), this is addressed somewhat in Study 2 and 3. *
+
+*Other potential things might be learning disability, fluency in language, familiarity with the subject...*
+
+*NOTE: These things may all be related to the outcome (scores on questions), but would not actually be _confounding_ in this study since note method was assigned.*
+
+13. How would you communicate the results of this study with a single tweet (280 characters or less)? Be sure to include a visualization and try to incorporate actual values from our analysis in your statement, while keeping it understandable to the general public.
+
+
+## EXTRA:
+
+Check out the results from Study 2 and 3 to see some interesting interaction effects of note taking and studying?

@@ -1,0 +1,46 @@
+---
+title: 'St. Olaf R Workshop 2026'
+subtitle: 'Transform a Lesson with R - Instructions'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+editor_options:
+  chunk_output_type: console
+---
+
+## Session Learning Outcomes
+
+1. To analyse an existing lesson and identify where you might incorporate R.
+2. To create or turn an existing lesson into one that uses R.
+3. To share, discuss, and collect feedback on the transformed lesson.
+4. To iterate and share until the new lesson is complete (as time allows).
+
+## Instructions
+
+Hopefully you've all completed your homework assignment from yesterday and have a lesson plan (or idea for one) to turn into an R worksheet. Here's our plan for this morning:
+
+1. Start off by pairing up with someone to analyze your existing lesson or idea (~10 min)
+    - What are the Learning Outcomes?
+    - Where do you plan on using R?
+    - What libraries, data, and functions will you need?
+    - Do you have a complete example of the code you're asking students to use?
+    - How can you break down the lesson into subsections?
+    - What conclusions do you want students to takeaway?
+    
+2. Create your lesson (~45 min)
+    - Use the *Lesson_template_blank.Rmd* file in the Day 3 folder for suggestions or start a brand new RMarkdown file.
+    - Feel free to find a quiet spot near the classroom to work.
+    - Ask facilitators or TAs questions, small technical questions to large conceptual ones are welcomed!
+
+3. Coffee break (15 min)
+
+4. Share or Teach your lesson (~20 min)
+    - Again, pair up or find a small group to run through your lesson.
+    - Look for bugs, unclear instructions, or any other issues.
+
+5. Larger discussion (~30 min)
+    - Either as one big group or a few groups (based on department?) discuss the challenges of using R in your class.
+    - Have a few volunteers share their lesson or trouble shoot issues together.
+
+6. Remaining time to iterate and discuss in small groups

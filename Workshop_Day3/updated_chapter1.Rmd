@@ -1,0 +1,74 @@
+---
+title: 'Review of Statistics 1 Material'
+subtitle: 'A quick review of linear modeling'
+author: "M Zillig"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+editor_options:
+  chunk_output_type: console
+---
+
+## Learning Objectives
+
+Here, we will review functions and statistical methods you learned in Statistics 1. Specifically, we will review how to summarize and visualize numeric data and how to run as simple linear model.
+
+## New Functions
+
+-   `lm()` Runs a linear regression
+
+-   `ggplot()` Creates a plot
+
+## Set Up
+
+```{r, message = F, warning = F}
+library(tidyverse)
+
+porsche <- read_csv("~/Sds_101A_SSI26/Class/Code/Workshop_Day3/PorschePrice.csv")
+```
+
+## Before Class:
+
+Review Chapters 3-22 in your textbook from Statistics 1.
+
+## During Class
+
+### Example 1.1: Porsche price vs. mileage
+
+First, let's examine our data. We are interested in how the price of a porsche changes based on the mileage.
+
+```{r}
+#Create a summary of the three variables 
+summary(porsche)
+
+
+#create a scatterplot showing the relationship between mileage and price 
+
+ggplot(data = porsche, aes(x = Mileage, y = Price))+
+  geom_point()
+
+```
+
+Next, let's run a simple linear model:
+
+```{r}
+porsche_fit <- lm(data = porsche, Price ~ Mileage)
+
+summary(porsche_fit)
+
+```
+
+1.  What is the slope estimate? Give an interpretation of the slope in the context of the question.
+
+2.  What is the R-squared value? Give an interpretation of the R-squared value in the context of the question.
+
+Because we only have a single slope and intercept term, we can easily use `geom_smooth()` to add the line of best fit:
+
+```{r}
+
+ggplot(data = porsche, aes(x = Mileage, y = Price))+
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+
+```
